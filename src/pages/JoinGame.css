@@ -1,0 +1,245 @@
+/* Join Game Styles */
+
+.join-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.join-content {
+    width: 100%;
+    max-width: 500px;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+    transition: color var(--transition-fast);
+}
+
+.back-link:hover {
+    color: var(--text-primary);
+}
+
+.join-card {
+    padding: 48px;
+}
+
+.join-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.join-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--gradient-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    color: white;
+}
+
+.join-header h1 {
+    font-size: 2rem;
+}
+
+/* PIN Input */
+.pin-input-wrapper {
+    position: relative;
+    margin-bottom: 32px;
+}
+
+.pin-input {
+    width: 100%;
+    padding: 24px;
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 0.5em;
+    color: var(--text-primary);
+    background: var(--bg-glass);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    outline: none;
+    transition: all var(--transition-normal);
+}
+
+.pin-input:focus {
+    border-color: var(--primary-purple);
+    box-shadow: 0 0 0 4px rgba(123, 47, 247, 0.2);
+}
+
+.pin-input::placeholder {
+    color: var(--text-muted);
+    letter-spacing: 0.3em;
+}
+
+.pin-label {
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    padding: 0 8px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    background: var(--bg-dark);
+}
+
+/* Quiz Preview */
+.quiz-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px 24px;
+    background: rgba(123, 47, 247, 0.1);
+    border: 1px solid rgba(123, 47, 247, 0.2);
+    border-radius: var(--radius-md);
+    margin-bottom: 30px;
+    color: var(--primary-purple);
+}
+
+.quiz-preview span {
+    font-weight: 600;
+}
+
+/* Avatar Card */
+.avatar-card {
+    padding: 32px;
+}
+
+.selected-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 30px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.avatar-emoji {
+    font-size: 4rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.random-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    background: var(--bg-glass);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.random-btn:hover {
+    background: var(--bg-glass-hover);
+    color: var(--text-primary);
+}
+
+/* Avatar Grid */
+.avatar-section {
+    margin-bottom: 24px;
+}
+
+.avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+}
+
+.avatar-option {
+    aspect-ratio: 1;
+    border-radius: 12px;
+    border: 3px solid transparent;
+    cursor: pointer;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+}
+
+.avatar-option:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.avatar-option.selected {
+    border-color: white;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+/* Nickname */
+.nickname-section {
+    margin-bottom: 24px;
+}
+
+.nickname-section .section-header span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nickname-display {
+    width: 100%;
+    padding: 16px 20px;
+    font-family: var(--font-body);
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-align: center;
+    color: var(--text-primary);
+    background: var(--bg-glass);
+    border: 2px solid rgba(123, 47, 247, 0.3);
+    border-radius: var(--radius-md);
+}
+
+.join-btn {
+    margin-bottom: 12px;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .join-card {
+        padding: 24px;
+    }
+
+    .pin-input {
+        font-size: 1.8rem;
+        letter-spacing: 0.3em;
+    }
+
+    .avatar-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .selected-avatar {
+        width: 100px;
+        height: 100px;
+    }
+
+    .avatar-emoji {
+        font-size: 3rem;
+    }
+}

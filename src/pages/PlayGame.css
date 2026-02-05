@@ -1,0 +1,245 @@
+/* Play Game Styles */
+
+.play-container {
+    min-height: 100vh;
+    background: var(--bg-dark);
+}
+
+.play-state {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* Waiting State */
+.waiting-state {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.waiting-content {
+    text-align: center;
+    color: white;
+}
+
+.player-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 0 auto 20px;
+}
+
+.waiting-content h2 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.waiting-content p {
+    opacity: 0.8;
+    margin-bottom: 30px;
+}
+
+.loading-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.loading-dots span {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: white;
+    animation: bounce 1.4s infinite ease-in-out;
+}
+
+.loading-dots span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.loading-dots span:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+
+    0%,
+    80%,
+    100% {
+        transform: scale(0);
+    }
+
+    40% {
+        transform: scale(1);
+    }
+}
+
+/* Question State */
+.question-state {
+    background: #46178F;
+}
+
+.question-timer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 40px;
+}
+
+.question-timer .urgent {
+    color: #E21B3C;
+    animation: pulse 0.5s infinite;
+}
+
+.answer-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    width: 100%;
+    max-width: 500px;
+}
+
+.answer-btn {
+    aspect-ratio: 1;
+    border: none;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.answer-btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.answer-btn:active {
+    transform: scale(0.98);
+}
+
+.answer-btn .shape {
+    font-size: 4rem;
+    color: white;
+}
+
+/* Answered State */
+.answered-state {
+    background: #333;
+}
+
+.answered-icon {
+    color: white;
+    margin-bottom: 20px;
+    animation: pulse 2s infinite;
+}
+
+.answered-state h2 {
+    color: white;
+    margin-bottom: 10px;
+}
+
+.answered-state p {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Result State */
+.result-state {
+    text-align: center;
+}
+
+.result-state.correct {
+    background: linear-gradient(135deg, #26890C, #1a5d08);
+}
+
+.result-state.incorrect {
+    background: linear-gradient(135deg, #E21B3C, #a01429);
+}
+
+.result-icon {
+    color: white;
+    margin-bottom: 20px;
+}
+
+.result-state h2 {
+    color: white;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+.points-earned {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 20px;
+}
+
+.current-score {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.2rem;
+}
+
+/* Finished State */
+.finished-state {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    text-align: center;
+    color: white;
+}
+
+.trophy-icon {
+    color: #FFD700;
+    margin-bottom: 20px;
+}
+
+.finished-state h1 {
+    font-size: 2.5rem;
+    margin-bottom: 40px;
+}
+
+.final-rank {
+    padding: 30px 50px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.rank-label {
+    display: block;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+}
+
+.rank-number {
+    font-family: var(--font-display);
+    font-size: 4rem;
+    font-weight: 800;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.final-score {
+    font-size: 1.5rem;
+}
+
+.final-score span {
+    font-weight: 700;
+    color: var(--primary-cyan);
+}
+
+@media (max-width: 480px) {
+    .answer-btn .shape {
+        font-size: 3rem;
+    }
+}
