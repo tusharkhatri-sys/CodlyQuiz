@@ -3,8 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
-import { Users, Play, Copy, Check, ChevronRight, Trophy, Zap } from 'lucide-react'
+import { Users, Play, Copy, Check, ChevronRight, Trophy, Zap, Volume2, VolumeX } from 'lucide-react'
 import { AVATARS } from '../utils/avatars'
+import { audioManager } from '../utils/audio'
 import './HostGame.css'
 
 const ANSWER_COLORS = ['#E21B3C', '#1368CE', '#D89E00', '#26890C']
@@ -14,6 +15,7 @@ export default function HostGame() {
     const { sessionId } = useParams()
     const { user } = useAuth()
     const navigate = useNavigate()
+    const [isClosing, setIsClosing] = useState(false)
 
     const [session, setSession] = useState(null)
     const [quiz, setQuiz] = useState(null)
@@ -29,14 +31,29 @@ export default function HostGame() {
     const [answerStats, setAnswerStats] = useState([])
     const [countdown, setCountdown] = useState(3)
 
+    const [isMuted, setIsMuted] = useState(audioManager.isMuted)
+
     useEffect(() => {
         fetchSessionData()
+        audioManager.playBgm('lobby')
 
+        return () => audioManager.stopBgm()
+    }, [])
+
+    const toggleMute = () => {
+        const muted = audioManager.toggleMute()
+        setIsMuted(muted)
+    }
+
+    useEffect(() => {
         const playersChannel = supabase
             .channel('game_players')
             .on('postgres_changes',
                 { event: 'INSERT', schema: 'public', table: 'game_players', filter: `session_id=eq.${sessionId}` },
-                (payload) => setPlayers(prev => [...prev, payload.new])
+                (payload) => {
+                    setPlayers(prev => [...prev, payload.new])
+                    audioManager.playSfx('join')
+                }
             )
             .subscribe()
 
@@ -127,6 +144,8 @@ export default function HostGame() {
         setCurrentIndex(0)
         setGameState('countdown')
         setCountdown(3)
+        audioManager.playSfx('start')
+        audioManager.playBgm('game')
     }
 
     const showQuestion = async () => {
@@ -229,7 +248,18 @@ export default function HostGame() {
         setGameState('finished')
     }
 
-    const endGame = () => navigate('/dashboard')
+    const endGame = async () => {
+        if (isClosing) return
+        setIsClosing(true)
+
+        // Update session status to closed to kick players
+        await supabase
+            .from('game_sessions')
+            .update({ status: 'closed' })
+            .eq('id', sessionId)
+
+        navigate('/dashboard')
+    }
 
     if (!session || !quiz) {
         return (
@@ -243,6 +273,9 @@ export default function HostGame() {
 
     return (
         <div className="host-container">
+            <button className="mute-btn-fixed" onClick={toggleMute}>
+                {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
+            </button>
             <AnimatePresence mode="wait">
                 {/* WAITING ROOM */}
                 {gameState === 'waiting' && (
@@ -254,6 +287,13 @@ export default function HostGame() {
                         exit={{ opacity: 0 }}
                     >
                         <div className="pin-display glass-card">
+                            <button
+                                className="close-btn-absolute"
+                                onClick={endGame}
+                                title="Close Lobby"
+                            >
+                                x
+                            </button>
                             <span className="pin-label">Game PIN</span>
                             <div className="pin-number">{session.game_pin}</div>
                             <button className="copy-btn" onClick={copyPin}>
@@ -270,6 +310,9 @@ export default function HostGame() {
                             <div className="players-header">
                                 <Users size={24} />
                                 <span>{players.length} Players</span>
+                                <button className="btn-text danger" onClick={endGame} disabled={isClosing}>
+                                    {isClosing ? 'Closing...' : 'Close Lobby'}
+                                </button>
                             </div>
 
                             <div className="players-grid">

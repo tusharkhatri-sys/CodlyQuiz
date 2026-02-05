@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '../lib/supabase'
-import { CheckCircle, XCircle, Trophy, Clock } from 'lucide-react'
+import { CheckCircle, XCircle, Trophy, Clock, Volume2, VolumeX, Zap, EyeOff } from 'lucide-react'
+import { audioManager } from '../utils/audio'
 import './PlayGame.css'
 
 const ANSWER_COLORS = ['#E21B3C', '#1368CE', '#D89E00', '#26890C']
@@ -25,6 +26,31 @@ export default function PlayGame() {
     const [questionStartTime, setQuestionStartTime] = useState(null)
     const [rank, setRank] = useState(null)
     const [totalScore, setTotalScore] = useState(0)
+    const [streak, setStreak] = useState(0)
+    const [isMuted, setIsMuted] = useState(audioManager.isMuted)
+
+    // Power-up States
+    const [powerups, setPowerups] = useState({ fifty: 1, double: 1 })
+    const [hiddenOptions, setHiddenOptions] = useState([]) // Indices of hidden options
+    const [activeMultiplier, setActiveMultiplier] = useState(1) // Current turn multiplier
+
+    // Reset powerups per question
+    useEffect(() => {
+        if (gameState === 'question') {
+            setHiddenOptions([])
+            setActiveMultiplier(1)
+        }
+    }, [gameState])
+
+    // Audio cleanup
+    useEffect(() => {
+        return () => audioManager.stopBgm()
+    }, [])
+
+    const toggleMute = () => {
+        const muted = audioManager.toggleMute()
+        setIsMuted(muted)
+    }
 
     // Initial fetch and realtime subscription
     useEffect(() => {
@@ -83,6 +109,7 @@ export default function PlayGame() {
         if (playerData) {
             setPlayer(playerData)
             setTotalScore(playerData.score)
+            setStreak(playerData.current_streak || 0)
         }
     }
 
@@ -95,6 +122,10 @@ export default function PlayGame() {
         } else if (newSession.status === 'finished') {
             fetchFinalRank()
             setGameState('finished')
+        } else if (newSession.status === 'cancelled' || newSession.status === 'closed') {
+            // Session closed by host - kick player
+            alert('Game session has been closed by the host!')
+            navigate('/join')
         }
     }
 
@@ -137,6 +168,29 @@ export default function PlayGame() {
         }
     }
 
+    const handlePowerup = (type) => {
+        if (powerups[type] <= 0) return
+        if (gameState !== 'question') return
+
+        if (type === 'fifty') {
+            const correctIndex = options.findIndex(o => o.is_correct)
+            const wrongIndices = options
+                .map((_, i) => i)
+                .filter(i => i !== correctIndex)
+
+            // Randomly hide 2 wrong options
+            const shuffled = wrongIndices.sort(() => 0.5 - Math.random())
+            const toHide = shuffled.slice(0, 2)
+
+            setHiddenOptions(toHide)
+        } else if (type === 'double') {
+            setActiveMultiplier(2)
+        }
+
+        audioManager.playSfx('join') // Use join sound as powerup sound for now
+        setPowerups(prev => ({ ...prev, [type]: prev[type] - 1 }))
+    }
+
     const submitAnswer = async (optionIndex) => {
         if (selectedAnswer !== null) return // Already answered
 
@@ -149,12 +203,36 @@ export default function PlayGame() {
 
         setIsCorrect(correct)
 
+        // Play sound effect
+        if (correct) {
+            audioManager.playSfx('correct')
+        } else {
+            audioManager.playSfx('wrong')
+        }
+
+        // Update local streak state
+        let newStreak = streak
+        if (correct) {
+            newStreak += 1
+        } else {
+            newStreak = 0
+        }
+        setStreak(newStreak)
+
         // Calculate points (faster = more points)
         let points = 0
         if (correct) {
             const maxTime = currentQuestion.time_limit * 1000
             const timeBonus = Math.max(0, 1 - (timeTaken / maxTime))
-            points = Math.round(currentQuestion.points * (0.5 + 0.5 * timeBonus))
+            let basePoints = Math.round(currentQuestion.points * (0.5 + 0.5 * timeBonus))
+
+            // Streak Multiplier
+            let multiplier = 1
+            if (newStreak >= 5) multiplier = 2
+            else if (newStreak >= 3) multiplier = 1.5
+            else if (newStreak >= 2) multiplier = 1.2
+
+            points = Math.round(basePoints * multiplier * activeMultiplier)
         }
         setPointsEarned(points)
 
@@ -168,15 +246,18 @@ export default function PlayGame() {
             points_earned: points
         })
 
-        // Update player score
-        if (points > 0) {
-            const newScore = totalScore + points
-            setTotalScore(newScore)
-            await supabase
-                .from('game_players')
-                .update({ score: newScore })
-                .eq('id', playerId)
-        }
+        // Update player score and streak
+        // Always update to save streak even if points is 0
+        const newScore = totalScore + points
+        setTotalScore(newScore)
+
+        await supabase
+            .from('game_players')
+            .update({
+                score: newScore,
+                current_streak: newStreak
+            })
+            .eq('id', playerId)
 
         setGameState('result')
     }
@@ -208,6 +289,26 @@ export default function PlayGame() {
 
     return (
         <div className="play-container">
+            {/* Game Status Bar */}
+            <div className="game-status-bar">
+                <div className="score-display">
+                    Score: {totalScore}
+                </div>
+                {streak >= 3 && (
+                    <motion.div
+                        className="streak-badge"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        exit={{ scale: 0 }}
+                    >
+                        🔥 {streak} Streak!
+                    </motion.div>
+                )}
+                <button className="mute-btn-fixed" onClick={toggleMute}>
+                    {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                </button>
+            </div>
+
             <AnimatePresence mode="wait">
                 {/* WAITING STATE */}
                 {gameState === 'waiting' && (
@@ -247,14 +348,35 @@ export default function PlayGame() {
                             <span className={timeLeft <= 5 ? 'urgent' : ''}>{timeLeft}</span>
                         </div>
 
+                        {/* Powerups UI */}
+                        <div className="powerups-container">
+                            <button
+                                className={`powerup-btn ${powerups.fifty === 0 ? 'used' : ''}`}
+                                onClick={() => handlePowerup('fifty')}
+                                disabled={powerups.fifty === 0}
+                            >
+                                <EyeOff size={20} />
+                                <span>50/50</span>
+                            </button>
+                            <button
+                                className={`powerup-btn ${powerups.double === 0 ? 'used' : ''} ${activeMultiplier === 2 ? 'active' : ''}`}
+                                onClick={() => handlePowerup('double')}
+                                disabled={powerups.double === 0}
+                            >
+                                <Zap size={20} />
+                                <span>2x</span>
+                            </button>
+                        </div>
+
                         <div className="answer-buttons">
                             {options.map((option, i) => (
                                 <motion.button
                                     key={option.id}
-                                    className="answer-btn"
+                                    className={`answer-btn ${hiddenOptions.includes(i) ? 'hidden' : ''}`}
                                     style={{ background: ANSWER_COLORS[i] }}
                                     onClick={() => submitAnswer(i)}
                                     whileTap={{ scale: 0.95 }}
+                                    disabled={hiddenOptions.includes(i)}
                                 >
                                     <span className="shape">{ANSWER_SHAPES[i]}</span>
                                 </motion.button>
