@@ -21,6 +21,43 @@
     flex: 1;
 }
 
+.header-center {
+    display: flex;
+    align-items: center;
+}
+
+.quiz-timer-setting {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    background: var(--bg-glass);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+}
+
+.timer-select {
+    padding: 8px 12px;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: var(--bg-dark);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+}
+
+.timer-select:focus {
+    outline: none;
+    border-color: var(--primary-purple);
+}
+
+.timer-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
 .title-input {
     flex: 1;
     max-width: 400px;

@@ -90,10 +90,8 @@ export default function PlayGame() {
         setSession(newSession)
 
         if (newSession.status === 'playing') {
+            // loadCurrentQuestion will set appropriate gameState
             await loadCurrentQuestion(newSession)
-            setGameState('question')
-            setSelectedAnswer(null)
-            setIsCorrect(null)
         } else if (newSession.status === 'finished') {
             fetchFinalRank()
             setGameState('finished')

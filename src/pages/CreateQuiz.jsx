@@ -20,6 +20,7 @@ export default function CreateQuiz() {
 
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
+    const [quizTimeLimit, setQuizTimeLimit] = useState(20) // Quiz-level timer
     const [questions, setQuestions] = useState([createEmptyQuestion()])
     const [activeQuestion, setActiveQuestion] = useState(0)
     const [saving, setSaving] = useState(false)
@@ -32,7 +33,6 @@ export default function CreateQuiz() {
             id: Date.now(),
             dbId: null, // Database ID for updates
             text: '',
-            timeLimit: 20,
             points: 1000,
             options: [
                 { text: '', isCorrect: false, dbId: null },
@@ -65,6 +65,8 @@ export default function CreateQuiz() {
             setDescription(quiz.description || '')
             setIsEditing(true)
 
+            // Get time limit from first question (quiz-level)
+
             // Load questions
             const { data: questionsData } = await supabase
                 .from('questions')
@@ -73,11 +75,13 @@ export default function CreateQuiz() {
                 .order('order_index')
 
             if (questionsData && questionsData.length > 0) {
+                // Set quiz time limit from first question
+                setQuizTimeLimit(questionsData[0].time_limit || 20)
+
                 const mappedQuestions = questionsData.map(q => ({
                     id: Date.now() + Math.random(),
                     dbId: q.id,
                     text: q.question_text,
-                    timeLimit: q.time_limit,
                     points: q.points,
                     options: q.answer_options
                         .sort((a, b) => a.option_index - b.option_index)
@@ -221,7 +225,7 @@ export default function CreateQuiz() {
                     .insert({
                         quiz_id: quizId,
                         question_text: q.text.trim(),
-                        time_limit: q.timeLimit,
+                        time_limit: quizTimeLimit, // Use quiz-level timer
                         points: q.points,
                         order_index: i
                     })
@@ -288,6 +292,28 @@ export default function CreateQuiz() {
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                     />
+                </div>
+
+                <div className="header-center">
+                    <div className="quiz-timer-setting">
+                        <Clock size={18} />
+                        <select
+                            value={quizTimeLimit}
+                            onChange={(e) => setQuizTimeLimit(Number(e.target.value))}
+                            className="timer-select"
+                        >
+                            <option value={5}>5 sec</option>
+                            <option value={10}>10 sec</option>
+                            <option value={15}>15 sec</option>
+                            <option value={20}>20 sec</option>
+                            <option value={30}>30 sec</option>
+                            <option value={45}>45 sec</option>
+                            <option value={60}>60 sec</option>
+                            <option value={90}>90 sec</option>
+                            <option value={120}>2 min</option>
+                        </select>
+                        <span className="timer-label">per question</span>
+                    </div>
                 </div>
 
                 <button
@@ -367,22 +393,6 @@ export default function CreateQuiz() {
                                     onChange={(e) => updateQuestion(activeQuestion, 'text', e.target.value)}
                                     rows={3}
                                 />
-
-                                <div className="question-settings">
-                                    <div className="setting">
-                                        <Clock size={16} />
-                                        <select
-                                            value={currentQ.timeLimit}
-                                            onChange={(e) => updateQuestion(activeQuestion, 'timeLimit', Number(e.target.value))}
-                                        >
-                                            <option value={5}>5 sec</option>
-                                            <option value={10}>10 sec</option>
-                                            <option value={20}>20 sec</option>
-                                            <option value={30}>30 sec</option>
-                                            <option value={60}>60 sec</option>
-                                        </select>
-                                    </div>
-                                </div>
                             </div>
 
                             {/* Answer Options */}
