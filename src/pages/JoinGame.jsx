@@ -89,7 +89,8 @@ export default function JoinGame() {
                 .insert({
                     session_id: session.id,
                     nickname: nickname.trim(),
-                    avatar_id: selectedAvatar.id
+                    avatar_id: selectedAvatar.id,
+                    user_id: user?.id || null // Link to auth user if logged in
                 })
                 .select()
                 .single()

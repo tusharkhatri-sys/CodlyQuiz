@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext'
 import { Users, Play, Copy, Check, ChevronRight, Trophy, Zap, Volume2, VolumeX } from 'lucide-react'
 import { AVATARS } from '../utils/avatars'
 import { audioManager } from '../utils/audio'
+import { getCoinsForRank } from '../utils/avatars'
 import './HostGame.css'
 
 const ANSWER_COLORS = ['#E21B3C', '#1368CE', '#D89E00', '#26890C']
@@ -30,6 +31,7 @@ export default function HostGame() {
     const [leaderboard, setLeaderboard] = useState([])
     const [answerStats, setAnswerStats] = useState([])
     const [countdown, setCountdown] = useState(3)
+    const [coinsAwarded, setCoinsAwarded] = useState(false)
 
     const [isMuted, setIsMuted] = useState(audioManager.isMuted)
 
@@ -214,6 +216,32 @@ export default function HostGame() {
         setGameState('leaderboard')
     }
 
+    // Award Coins when game finishes
+    useEffect(() => {
+        if (gameState === 'finished' && leaderboard.length > 0 && !coinsAwarded) {
+            awardCoins()
+        }
+    }, [gameState, leaderboard, coinsAwarded])
+
+    const awardCoins = async () => {
+        setCoinsAwarded(true)
+
+        // Loop through leaderboard and award coins based on rank
+        for (let i = 0; i < leaderboard.length; i++) {
+            const player = leaderboard[i]
+            const rank = i + 1
+            const coins = getCoinsForRank(rank)
+
+            // Only award if player is linked to a user account
+            if (player.user_id) {
+                await supabase.rpc('add_coins', {
+                    user_uuid: player.user_id,
+                    amount: coins
+                })
+            }
+        }
+    }
+
     const nextQuestion = () => {
         const nextIdx = currentIndex + 1
 
@@ -233,17 +261,24 @@ export default function HostGame() {
             .eq('id', sessionId)
 
         // Update player stats
+        // Update player stats (Commented out as RPC might not exist yet)
+        /*
         for (let i = 0; i < leaderboard.length; i++) {
             const player = leaderboard[i]
             if (player.user_id) {
                 const isWinner = i === 0
-                await supabase.rpc('update_player_stats', {
-                    p_user_id: player.user_id,
-                    p_points: player.score,
-                    p_is_winner: isWinner
-                })
+                try {
+                    await supabase.rpc('update_player_stats', {
+                        p_user_id: player.user_id,
+                        p_points: player.score,
+                        p_is_winner: isWinner
+                    })
+                } catch (err) {
+                    console.error('Failed to update stats', err)
+                }
             }
         }
+        */
 
         setGameState('finished')
     }

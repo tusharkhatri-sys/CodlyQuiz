@@ -11,28 +11,47 @@ export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        // Get initial session
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setUser(session?.user ?? null)
-            if (session?.user) {
-                loadProfile(session.user.id)
+        let mounted = true
+
+        async function initSession() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession()
+
+                if (mounted) {
+                    setUser(session?.user ?? null)
+                    if (session?.user) {
+                        await loadProfile(session.user.id)
+                    }
+                }
+            } catch (error) {
+                console.error('Session init error:', error)
+            } finally {
+                if (mounted) {
+                    setLoading(false)
+                }
             }
-            setLoading(false)
-        })
+        }
+
+        initSession()
 
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             async (_event, session) => {
-                setUser(session?.user ?? null)
-                if (session?.user) {
-                    await loadProfile(session.user.id)
-                } else {
-                    setProfile(null)
+                if (mounted) {
+                    setUser(session?.user ?? null)
+                    if (session?.user) {
+                        await loadProfile(session.user.id)
+                    } else {
+                        setProfile(null)
+                    }
                 }
             }
         )
 
-        return () => subscription.unsubscribe()
+        return () => {
+            mounted = false
+            subscription.unsubscribe()
+        }
     }, [])
 
     const loadProfile = async (userId) => {
