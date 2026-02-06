@@ -1,9 +1,10 @@
-/* Home Page Styles */
+/* Home Page Styles - Kahoot Theme */
 
 .home-container {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    background: var(--kahoot-purple);
 }
 
 /* Navbar */
@@ -18,8 +19,11 @@
 
 .nav-logo {
     font-family: var(--font-display);
-    font-size: 1.8rem;
-    font-weight: 700;
+    font-size: 2rem;
+    font-weight: 900;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .nav-user {
@@ -29,25 +33,26 @@
 }
 
 .nav-username {
-    font-weight: 600;
-    color: var(--text-secondary);
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .nav-avatar {
-    width: 44px;
-    height: 44px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
-    background: var(--gradient-primary);
+    background: var(--answer-green);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
-    font-size: 1.1rem;
+    font-weight: 800;
+    font-size: 1.2rem;
     cursor: pointer;
-    transition: transform var(--transition-normal);
-    border: none;
+    transition: transform var(--transition-fast);
+    border: 3px solid white;
     color: white;
     font-family: var(--font-display);
+    box-shadow: 0 4px 0 #1d6a09;
 }
 
 .nav-avatar:hover {
@@ -64,13 +69,11 @@
     top: 100%;
     right: 0;
     margin-top: 12px;
-    min-width: 200px;
-    padding: 8px;
-    background: rgba(20, 20, 30, 0.95);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-card);
+    min-width: 220px;
+    padding: 10px;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     z-index: 1000;
 }
 
@@ -78,30 +81,35 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 16px;
-    border-radius: var(--radius-sm);
-    color: var(--text-primary);
+    padding: 14px 18px;
+    border-radius: var(--radius-md);
+    color: var(--text-dark);
     transition: background var(--transition-fast);
     cursor: pointer;
     border: none;
     background: none;
     width: 100%;
     font-family: var(--font-body);
-    font-size: 0.95rem;
+    font-size: 1rem;
+    font-weight: 600;
     text-decoration: none;
 }
 
 .dropdown-item:hover {
-    background: var(--bg-glass);
+    background: #f5f5f5;
 }
 
 .dropdown-item.danger {
     color: var(--answer-red);
 }
 
+.dropdown-item.danger:hover {
+    background: rgba(226, 27, 60, 0.1);
+}
+
 .dropdown-divider {
-    height: 1px;
-    background: rgba(255, 255, 255, 0.1);
+    height: 2px;
+    background: #eee;
     margin: 8px 0;
 }
 
@@ -118,14 +126,19 @@
 
 .hero-title {
     font-size: clamp(3rem, 8vw, 5rem);
+    font-weight: 900;
     margin-bottom: 20px;
+    color: white;
+    text-transform: uppercase;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .hero-subtitle {
     font-size: 1.3rem;
-    color: var(--text-secondary);
+    color: rgba(255, 255, 255, 0.9);
     max-width: 500px;
-    margin-bottom: 48px;
+    margin-bottom: 50px;
+    font-weight: 500;
 }
 
 /* Action Cards */
@@ -142,52 +155,65 @@
     text-align: center;
     cursor: pointer;
     transition: all var(--transition-normal);
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-xl);
+    border: 3px solid rgba(255, 255, 255, 0.2);
 }
 
 .action-card:hover {
-    transform: translateY(-8px) scale(1.02);
-    background: var(--bg-glass-hover);
+    transform: translateY(-8px);
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.4);
 }
 
 .action-icon {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
+    width: 90px;
+    height: 90px;
+    border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto 24px;
     color: white;
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3);
 }
 
+/* Action Card Colors - Kahoot Style */
 .action-card.host .action-icon {
-    background: linear-gradient(135deg, #7B2FF7 0%, #F107A3 100%);
+    background: var(--answer-green);
+    box-shadow: 0 6px 0 #1d6a09;
 }
 
 .action-card.join .action-icon {
-    background: linear-gradient(135deg, #00D4FF 0%, #7B2FF7 100%);
+    background: var(--answer-blue);
+    box-shadow: 0 6px 0 #0f52a3;
 }
 
 .action-card.leaderboard .action-icon {
-    background: linear-gradient(135deg, #FFD700 0%, #FF8C00 100%);
+    background: var(--answer-yellow);
+    box-shadow: 0 6px 0 #a67a00;
 }
 
 .action-title {
     font-family: var(--font-display);
     font-size: 1.5rem;
+    font-weight: 800;
     margin-bottom: 12px;
+    color: white;
+    text-transform: uppercase;
 }
 
 .action-desc {
-    color: var(--text-secondary);
+    color: rgba(255, 255, 255, 0.8);
     font-size: 0.95rem;
+    font-weight: 500;
 }
 
 /* Loading Overlay */
 .loading-overlay {
     position: fixed;
     inset: 0;
-    background: var(--bg-dark);
+    background: var(--kahoot-purple);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -195,10 +221,10 @@
 }
 
 .loading-spinner {
-    width: 50px;
-    height: 50px;
-    border: 3px solid var(--bg-glass);
-    border-top-color: var(--primary-purple);
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -216,5 +242,9 @@
     .action-card {
         width: 100%;
         max-width: 320px;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
     }
 }

@@ -1,4 +1,4 @@
-/* Auth Page Styles */
+/* Auth Page Styles - Kahoot Theme */
 
 .auth-container {
     min-height: 100vh;
@@ -6,65 +6,96 @@
     align-items: center;
     justify-content: center;
     padding: 40px 20px;
+    background: var(--kahoot-purple);
 }
 
 .auth-card {
     width: 100%;
-    max-width: 480px;
+    max-width: 460px;
     padding: 48px;
+    background: white;
+    border-radius: var(--radius-xl);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 .auth-header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 36px;
 }
 
 .auth-logo {
     font-family: var(--font-display);
     font-size: 2.5rem;
-    font-weight: 700;
+    font-weight: 900;
     margin-bottom: 8px;
+    color: var(--kahoot-purple);
+    text-transform: uppercase;
 }
 
 .auth-subtitle {
-    color: var(--text-secondary);
+    color: #666;
     font-size: 1rem;
+    font-weight: 500;
+}
+
+/* Override input styles for white background */
+.auth-card .input-field {
+    background: #f5f5f5;
+    border: 3px solid #e0e0e0;
+    color: var(--text-dark);
+}
+
+.auth-card .input-field:focus {
+    border-color: var(--kahoot-purple);
+    background: white;
+}
+
+.auth-card .input-group label {
+    color: #444;
+}
+
+.auth-card .input-with-icon .input-icon {
+    color: #888;
 }
 
 .auth-divider {
     display: flex;
     align-items: center;
     gap: 16px;
-    margin: 32px 0;
-    color: var(--text-muted);
-    font-size: 0.85rem;
+    margin: 28px 0;
+    color: #999;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
 }
 
 .auth-divider::before,
 .auth-divider::after {
     content: '';
     flex: 1;
-    height: 1px;
-    background: rgba(255, 255, 255, 0.1);
+    height: 2px;
+    background: #e0e0e0;
 }
 
 .auth-footer {
     text-align: center;
-    margin-top: 32px;
-    color: var(--text-secondary);
+    margin-top: 28px;
+    color: #666;
     font-size: 0.95rem;
+    font-weight: 500;
 }
 
 .auth-footer a {
-    color: var(--primary-cyan);
+    color: var(--kahoot-purple);
     text-decoration: none;
-    font-weight: 600;
+    font-weight: 700;
     margin-left: 4px;
     transition: color var(--transition-fast);
 }
 
 .auth-footer a:hover {
-    color: var(--primary-pink);
+    color: var(--kahoot-purple-dark);
+    text-decoration: underline;
 }
 
 /* Social Button */
@@ -74,40 +105,64 @@
     justify-content: center;
     gap: 12px;
     width: 100%;
-    padding: 14px 20px;
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: var(--text-primary);
-    background: var(--bg-glass);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 16px 20px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    background: #f5f5f5;
+    border: 2px solid #e0e0e0;
     border-radius: var(--radius-md);
     cursor: pointer;
-    transition: all var(--transition-normal);
+    transition: all var(--transition-fast);
     font-family: var(--font-body);
 }
 
 .social-btn:hover {
-    background: var(--bg-glass-hover);
-    transform: translateY(-2px);
+    background: #eee;
+    border-color: #ccc;
+}
+
+/* Primary Button Override for Auth */
+.auth-card .btn-primary {
+    background: var(--answer-green);
+    box-shadow: 0 4px 0 #1d6a09;
+    width: 100%;
+    padding: 18px 32px;
+    font-size: 1.1rem;
+}
+
+.auth-card .btn-primary:hover {
+    background: #2ea00e;
 }
 
 /* Password Toggle */
 .password-toggle {
     position: absolute;
-    right: 18px;
+    right: 16px;
     top: 50%;
     transform: translateY(-50%);
     background: none;
     border: none;
-    color: var(--text-muted);
+    color: #888;
     cursor: pointer;
-    padding: 4px;
+    padding: 6px;
     display: flex;
     transition: color var(--transition-fast);
 }
 
 .password-toggle:hover {
-    color: var(--text-primary);
+    color: var(--kahoot-purple);
+}
+
+/* Message Overrides for White Background */
+.auth-card .message-error {
+    background: rgba(226, 27, 60, 0.1);
+    color: var(--answer-red);
+}
+
+.auth-card .message-success {
+    background: rgba(38, 137, 12, 0.1);
+    color: var(--answer-green);
 }
 
 /* Responsive */

@@ -1,4 +1,4 @@
-/* Join Game Styles */
+/* Join Game Styles - Kahoot Theme */
 
 .join-container {
     min-height: 100vh;
@@ -6,6 +6,7 @@
     align-items: center;
     justify-content: center;
     padding: 20px;
+    background: var(--kahoot-purple);
 }
 
 .join-content {
@@ -17,44 +18,52 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    color: var(--text-secondary);
+    color: rgba(255, 255, 255, 0.8);
     margin-bottom: 24px;
+    font-weight: 600;
     transition: color var(--transition-fast);
 }
 
 .back-link:hover {
-    color: var(--text-primary);
+    color: white;
 }
 
 .join-card {
-    padding: 48px;
+    padding: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 .join-header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 32px;
 }
 
 .join-icon {
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background: var(--gradient-secondary);
+    background: var(--answer-green);
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto 20px;
     color: white;
+    box-shadow: 0 4px 0 #1d6a09;
 }
 
 .join-header h1 {
     font-size: 2rem;
+    font-weight: 800;
+    color: white;
+    text-transform: uppercase;
 }
 
-/* PIN Input */
+/* PIN Input - Kahoot Style */
 .pin-input-wrapper {
     position: relative;
-    margin-bottom: 32px;
+    margin-bottom: 24px;
 }
 
 .pin-input {
@@ -62,35 +71,38 @@
     padding: 24px;
     font-family: var(--font-display);
     font-size: 2.5rem;
-    font-weight: 700;
+    font-weight: 800;
     text-align: center;
     letter-spacing: 0.5em;
-    color: var(--text-primary);
-    background: var(--bg-glass);
-    border: 2px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-dark);
+    background: white;
+    border: 4px solid transparent;
     border-radius: var(--radius-lg);
     outline: none;
-    transition: all var(--transition-normal);
+    transition: all var(--transition-fast);
 }
 
 .pin-input:focus {
-    border-color: var(--primary-purple);
-    box-shadow: 0 0 0 4px rgba(123, 47, 247, 0.2);
+    border-color: var(--answer-green);
+    box-shadow: 0 0 0 4px rgba(38, 137, 12, 0.3);
 }
 
 .pin-input::placeholder {
-    color: var(--text-muted);
+    color: #ccc;
     letter-spacing: 0.3em;
+    font-size: 1.5rem;
 }
 
 .pin-label {
     position: absolute;
-    top: -10px;
+    top: -12px;
     left: 20px;
-    padding: 0 8px;
+    padding: 0 10px;
     font-size: 0.85rem;
-    color: var(--text-secondary);
-    background: var(--bg-dark);
+    font-weight: 700;
+    color: white;
+    background: var(--kahoot-purple);
+    text-transform: uppercase;
 }
 
 /* Quiz Preview */
@@ -100,20 +112,23 @@
     justify-content: center;
     gap: 10px;
     padding: 16px 24px;
-    background: rgba(123, 47, 247, 0.1);
-    border: 1px solid rgba(123, 47, 247, 0.2);
+    background: rgba(38, 137, 12, 0.2);
+    border: 2px solid var(--answer-green);
     border-radius: var(--radius-md);
-    margin-bottom: 30px;
-    color: var(--primary-purple);
+    margin-bottom: 24px;
+    color: white;
 }
 
 .quiz-preview span {
-    font-weight: 600;
+    font-weight: 700;
 }
 
 /* Avatar Card */
 .avatar-card {
     padding: 32px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 .selected-avatar {
@@ -123,8 +138,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 30px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    margin: 0 auto 24px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    border: 4px solid white;
 }
 
 .avatar-emoji {
@@ -136,26 +152,30 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 12px;
-    font-weight: 600;
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+    font-size: 0.9rem;
 }
 
 .random-btn {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 12px;
+    padding: 8px 16px;
     font-size: 0.85rem;
-    background: var(--bg-glass);
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.2);
     border: none;
-    border-radius: var(--radius-sm);
-    color: var(--text-secondary);
+    border-radius: var(--radius-md);
+    color: white;
     cursor: pointer;
     transition: all var(--transition-fast);
 }
 
 .random-btn:hover {
-    background: var(--bg-glass-hover);
-    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
 }
 
 /* Avatar Grid */
@@ -171,7 +191,7 @@
 
 .avatar-option {
     aspect-ratio: 1;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     border: 3px solid transparent;
     cursor: pointer;
     font-size: 1.5rem;
@@ -179,16 +199,19 @@
     align-items: center;
     justify-content: center;
     transition: all var(--transition-fast);
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .avatar-option:hover {
-    border-color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
     transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .avatar-option.selected {
     border-color: white;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
 }
 
 /* Nickname */
@@ -207,16 +230,18 @@
     padding: 16px 20px;
     font-family: var(--font-body);
     font-size: 1.2rem;
-    font-weight: 600;
+    font-weight: 700;
     text-align: center;
-    color: var(--text-primary);
-    background: var(--bg-glass);
-    border: 2px solid rgba(123, 47, 247, 0.3);
+    color: var(--text-dark);
+    background: white;
+    border: 3px solid var(--answer-green);
     border-radius: var(--radius-md);
 }
 
 .join-btn {
     margin-bottom: 12px;
+    font-size: 1.1rem;
+    padding: 18px 40px;
 }
 
 /* Responsive */
@@ -228,6 +253,7 @@
     .pin-input {
         font-size: 1.8rem;
         letter-spacing: 0.3em;
+        padding: 20px;
     }
 
     .avatar-grid {

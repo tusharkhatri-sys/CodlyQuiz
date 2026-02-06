@@ -1,9 +1,10 @@
-/* Create Quiz Styles */
+/* Create Quiz Styles - Kahoot Theme */
 
 .create-container {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    background: #f2f2f2;
 }
 
 .create-header {
@@ -12,6 +13,8 @@
     align-items: center;
     padding: 20px 40px;
     gap: 20px;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
 .header-left {
@@ -31,31 +34,33 @@
     align-items: center;
     gap: 10px;
     padding: 10px 20px;
-    background: var(--bg-glass);
+    background: #f5f5f5;
     border-radius: var(--radius-md);
-    color: var(--text-primary);
+    color: var(--text-dark);
+    border: 2px solid #e0e0e0;
 }
 
 .timer-select {
     padding: 8px 12px;
     font-family: var(--font-body);
     font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    background: var(--bg-dark);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-weight: 700;
+    color: var(--text-dark);
+    background: white;
+    border: 2px solid #e0e0e0;
     border-radius: var(--radius-sm);
     cursor: pointer;
 }
 
 .timer-select:focus {
     outline: none;
-    border-color: var(--primary-purple);
+    border-color: var(--kahoot-purple);
 }
 
 .timer-label {
     font-size: 0.9rem;
-    color: var(--text-secondary);
+    font-weight: 600;
+    color: #666;
 }
 
 .title-input {
@@ -64,29 +69,31 @@
     padding: 12px 20px;
     font-family: var(--font-display);
     font-size: 1.3rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    background: var(--bg-glass);
-    border: 2px solid transparent;
+    font-weight: 700;
+    color: var(--text-dark);
+    background: #f5f5f5;
+    border: 3px solid transparent;
     border-radius: var(--radius-md);
     outline: none;
-    transition: all var(--transition-normal);
+    transition: all var(--transition-fast);
 }
 
 .title-input:focus {
-    border-color: var(--primary-purple);
+    border-color: var(--kahoot-purple);
+    background: white;
 }
 
 .title-input::placeholder {
-    color: var(--text-muted);
+    color: #999;
 }
 
 .error-banner {
-    background: rgba(226, 27, 60, 0.15);
-    border: 1px solid rgba(226, 27, 60, 0.3);
-    color: #FF6B6B;
+    background: rgba(226, 27, 60, 0.1);
+    border-bottom: 3px solid var(--answer-red);
+    color: var(--answer-red);
     padding: 14px 40px;
     text-align: center;
+    font-weight: 700;
 }
 
 /* Layout */
@@ -94,7 +101,7 @@
     display: flex;
     flex: 1;
     gap: 24px;
-    padding: 0 40px 40px;
+    padding: 24px 40px 40px;
     overflow: hidden;
 }
 
@@ -105,6 +112,9 @@
     display: flex;
     flex-direction: column;
     max-height: calc(100vh - 140px);
+    background: white;
+    border-radius: var(--radius-xl);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .sidebar-header {
@@ -112,26 +122,30 @@
     justify-content: space-between;
     align-items: center;
     padding: 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    font-weight: 600;
+    border-bottom: 2px solid #f0f0f0;
+    font-weight: 700;
+    color: var(--text-dark);
+    text-transform: uppercase;
 }
 
 .add-btn {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    background: var(--gradient-primary);
+    background: var(--answer-green);
     border: none;
     color: white;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform var(--transition-normal);
+    transition: all var(--transition-fast);
+    box-shadow: 0 3px 0 #1d6a09;
 }
 
 .add-btn:hover {
     transform: scale(1.1);
+    background: #2ea00e;
 }
 
 .question-list {
@@ -149,38 +163,42 @@
     cursor: pointer;
     transition: all var(--transition-fast);
     margin-bottom: 8px;
+    border: 2px solid transparent;
 }
 
 .question-item:hover {
-    background: var(--bg-glass);
+    background: #f5f5f5;
 }
 
 .question-item.active {
-    background: rgba(123, 47, 247, 0.2);
-    border: 1px solid rgba(123, 47, 247, 0.3);
+    background: rgba(70, 23, 143, 0.1);
+    border-color: var(--kahoot-purple);
 }
 
 .q-number {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    background: var(--bg-glass);
+    background: #e0e0e0;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-size: 0.9rem;
+    font-weight: 700;
     flex-shrink: 0;
+    color: var(--text-dark);
 }
 
 .question-item.active .q-number {
-    background: var(--gradient-primary);
+    background: var(--kahoot-purple);
+    color: white;
 }
 
 .q-preview {
     flex: 1;
     font-size: 0.9rem;
-    color: var(--text-secondary);
+    font-weight: 600;
+    color: #666;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -214,15 +232,19 @@
 }
 
 .question-input-wrapper {
-    padding: 24px;
+    padding: 30px;
+    background: white;
+    border-radius: var(--radius-xl);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .question-input {
     width: 100%;
     padding: 16px;
     font-family: var(--font-body);
-    font-size: 1.2rem;
-    color: var(--text-primary);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-dark);
     background: transparent;
     border: none;
     outline: none;
@@ -230,7 +252,7 @@
 }
 
 .question-input::placeholder {
-    color: var(--text-muted);
+    color: #999;
 }
 
 .question-settings {
@@ -238,77 +260,105 @@
     gap: 16px;
     margin-top: 16px;
     padding-top: 16px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 2px solid #f0f0f0;
 }
 
 .setting {
     display: flex;
     align-items: center;
     gap: 8px;
-    color: var(--text-secondary);
+    color: #666;
+    font-weight: 600;
 }
 
 .setting select {
-    padding: 8px 12px;
+    padding: 10px 14px;
     font-family: var(--font-body);
     font-size: 0.9rem;
-    color: var(--text-primary);
-    background: #1a1a2e;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-weight: 700;
+    color: var(--text-dark);
+    background: #f5f5f5;
+    border: 2px solid #e0e0e0;
     border-radius: var(--radius-sm);
     outline: none;
     cursor: pointer;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    padding-right: 30px;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    padding-right: 35px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 10px center;
+    background-position: right 12px center;
+}
+
+.setting select:focus {
+    border-color: var(--kahoot-purple);
 }
 
 .setting select option {
-    background: #1a1a2e;
-    color: white;
+    background: white;
+    color: var(--text-dark);
     padding: 10px;
 }
 
-/* Answers Grid */
+/* Answers Grid - Kahoot Colors */
 .answers-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    gap: 12px;
 }
 
 .answer-card {
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 20px;
-    background: var(--answer-color);
+    padding: 24px;
     border-radius: var(--radius-lg);
     position: relative;
-    transition: all var(--transition-normal);
+    transition: all var(--transition-fast);
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Kahoot Answer Colors */
+.answer-card:nth-child(1) {
+    background: var(--answer-red);
+    box-shadow: 0 6px 0 #b01530;
+}
+
+.answer-card:nth-child(2) {
+    background: var(--answer-blue);
+    box-shadow: 0 6px 0 #0f52a3;
+}
+
+.answer-card:nth-child(3) {
+    background: var(--answer-yellow);
+    box-shadow: 0 6px 0 #a67a00;
+}
+
+.answer-card:nth-child(4) {
+    background: var(--answer-green);
+    box-shadow: 0 6px 0 #1d6a09;
 }
 
 .answer-card.correct {
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5), 0 0 30px rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 0 4px white, 0 0 30px rgba(255, 255, 255, 0.4), 0 6px 0 rgba(0, 0, 0, 0.3);
 }
 
 .answer-shape {
-    font-size: 1.5rem;
-    opacity: 0.9;
+    font-size: 2rem;
+    color: white;
 }
 
 .answer-input {
     flex: 1;
-    padding: 12px;
+    padding: 14px;
     font-family: var(--font-body);
-    font-size: 1rem;
+    font-size: 1.1rem;
+    font-weight: 700;
     color: white;
     background: rgba(0, 0, 0, 0.2);
     border: none;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     outline: none;
 }
 
@@ -321,13 +371,14 @@
     border: none;
     color: rgba(255, 255, 255, 0.5);
     cursor: pointer;
-    padding: 4px;
+    padding: 6px;
     display: flex;
     transition: all var(--transition-fast);
 }
 
 .correct-btn:hover {
     color: rgba(255, 255, 255, 0.8);
+    transform: scale(1.1);
 }
 
 .correct-btn.active {
@@ -349,5 +400,10 @@
 
     .answers-grid {
         grid-template-columns: 1fr;
+    }
+
+    .create-header {
+        padding: 15px 20px;
+        flex-wrap: wrap;
     }
 }

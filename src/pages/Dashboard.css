@@ -1,43 +1,52 @@
-/* Dashboard Styles */
+/* Dashboard Styles - Kahoot Theme */
 
 .dashboard-container {
     min-height: 100vh;
     padding: 20px;
+    background: #f2f2f2;
 }
 
 .dashboard-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px;
+    padding: 20px 30px;
     margin-bottom: 40px;
+    background: white;
+    border-radius: var(--radius-xl);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .header-left {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 20px;
 }
 
 .header-left h1 {
     font-size: 2rem;
+    font-weight: 800;
+    color: var(--kahoot-purple);
+    text-transform: uppercase;
 }
 
 .back-btn {
-    width: 44px;
-    height: 44px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
-    background: var(--bg-glass);
+    background: #f5f5f5;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--text-primary);
-    transition: all var(--transition-normal);
+    color: var(--kahoot-purple);
+    transition: all var(--transition-fast);
+    border: 2px solid #e0e0e0;
 }
 
 .back-btn:hover {
-    background: var(--bg-glass-hover);
-    transform: scale(1.1);
+    background: var(--kahoot-purple);
+    color: white;
+    border-color: var(--kahoot-purple);
 }
 
 .dashboard-content {
@@ -53,50 +62,68 @@
     padding: 100px 0;
 }
 
+.loading-state .spinner {
+    border-color: #e0e0e0;
+    border-top-color: var(--kahoot-purple);
+}
+
 /* Empty State */
 .empty-state {
     text-align: center;
     padding: 80px 40px;
     max-width: 400px;
     margin: 60px auto;
+    background: white;
+    border-radius: var(--radius-xl);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .empty-icon {
-    font-size: 4rem;
+    font-size: 5rem;
     margin-bottom: 24px;
 }
 
 .empty-state h2 {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
+    font-weight: 800;
     margin-bottom: 12px;
+    color: var(--text-dark);
 }
 
 .empty-state p {
-    color: var(--text-secondary);
+    color: #666;
     margin-bottom: 32px;
+    font-weight: 500;
 }
 
 /* Quiz Grid */
 .quizzes-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 24px;
 }
 
 .quiz-card {
     overflow: hidden;
-    transition: transform var(--transition-normal);
+    transition: transform var(--transition-fast);
+    background: white;
+    border-radius: var(--radius-xl);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 2px solid transparent;
 }
 
 .quiz-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-6px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    border-color: var(--kahoot-purple);
 }
 
 .quiz-cover {
-    height: 140px;
+    height: 160px;
     background-size: cover;
     background-position: center;
     position: relative;
+    background-color: var(--kahoot-purple);
 }
 
 .quiz-menu {
@@ -106,8 +133,8 @@
 }
 
 .menu-btn {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(10px);
@@ -117,11 +144,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background var(--transition-fast);
+    transition: all var(--transition-fast);
 }
 
 .menu-btn:hover {
     background: rgba(0, 0, 0, 0.7);
+    transform: scale(1.1);
 }
 
 .menu-dropdown {
@@ -129,23 +157,24 @@
     top: 100%;
     right: 0;
     margin-top: 8px;
-    min-width: 140px;
+    min-width: 160px;
     padding: 8px;
-    background: rgba(20, 20, 30, 0.95);
+    background: white;
     backdrop-filter: blur(20px);
-    border-radius: var(--radius-md);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
     z-index: 100;
 }
 
 .menu-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 14px;
-    border-radius: var(--radius-sm);
-    color: var(--text-primary);
-    font-size: 0.9rem;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    color: var(--text-dark);
+    font-size: 0.95rem;
+    font-weight: 600;
     background: none;
     border: none;
     width: 100%;
@@ -155,32 +184,44 @@
 }
 
 .menu-item:hover {
-    background: var(--bg-glass);
+    background: #f5f5f5;
 }
 
 .menu-item.danger {
     color: var(--answer-red);
 }
 
+.menu-item.danger:hover {
+    background: rgba(226, 27, 60, 0.1);
+}
+
 .quiz-info {
-    padding: 20px;
+    padding: 24px;
 }
 
 .quiz-title {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
+    font-weight: 800;
     margin-bottom: 8px;
+    color: var(--text-dark);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .quiz-meta {
-    color: var(--text-secondary);
+    color: #888;
     font-size: 0.9rem;
+    font-weight: 500;
 }
 
 .quiz-actions {
-    padding: 0 20px 20px;
+    padding: 0 24px 24px;
+}
+
+.quiz-actions .btn-primary {
+    background: var(--answer-green);
+    box-shadow: 0 4px 0 #1d6a09;
 }
 
 /* Responsive */
@@ -189,9 +230,14 @@
         flex-direction: column;
         gap: 20px;
         align-items: flex-start;
+        padding: 20px;
     }
 
     .quizzes-grid {
         grid-template-columns: 1fr;
+    }
+
+    .header-left h1 {
+        font-size: 1.5rem;
     }
 }

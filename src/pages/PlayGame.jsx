@@ -418,7 +418,17 @@ export default function PlayGame() {
                             {isCorrect ? <CheckCircle size={80} /> : <XCircle size={80} />}
                         </motion.div>
 
-                        <h2>{isCorrect ? 'Correct!' : 'Wrong!'}</h2>
+                        <h2>{isCorrect ? 'Correct' : 'Incorrect'}</h2>
+
+                        {isCorrect && streak >= 1 && (
+                            <motion.div
+                                className="streak-display"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                            >
+                                Answer Streak <span className="streak-number">{streak}</span>
+                            </motion.div>
+                        )}
 
                         {isCorrect && (
                             <motion.div
@@ -426,13 +436,20 @@ export default function PlayGame() {
                                 initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                             >
-                                +{pointsEarned} points
+                                + {pointsEarned}
                             </motion.div>
                         )}
 
-                        <div className="current-score">
-                            Total: {totalScore} points
-                        </div>
+                        {isCorrect && rank && rank <= 3 && (
+                            <motion.p
+                                className="podium-message"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                style={{ color: '#26890C', fontWeight: 700, marginTop: 16 }}
+                            >
+                                You're on the podium!
+                            </motion.p>
+                        )}
                     </motion.div>
                 )}
 

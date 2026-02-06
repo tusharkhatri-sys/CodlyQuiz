@@ -1,223 +1,260 @@
-/* Host Game Styles */
+/* Host Game Styles - Exact Kahoot Clone */
 
 .host-container {
     min-height: 100vh;
-    background: var(--bg-dark);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    overflow: hidden;
+    background: var(--kahoot-purple);
+    position: relative;
 }
 
-/* Waiting Room */
+/* Mute Button */
 .mute-btn-fixed {
     position: fixed;
-    top: 20px;
+    bottom: 20px;
     right: 20px;
-    z-index: 1000;
-    background: rgba(255, 255, 255, 0.1);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
     border: none;
     color: white;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    backdrop-filter: blur(5px);
-    transition: all 0.2s;
+    z-index: 100;
+    transition: background var(--transition-fast);
 }
 
 .mute-btn-fixed:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.3);
 }
 
+/* ===========================================
+   WAITING ROOM - "Get ready to join" Screen
+   =========================================== */
 .waiting-room {
-    text-align: center;
-    width: 100%;
-    max-width: 800px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 40px;
+    gap: 30px;
 }
 
+/* Top bar with Kahoot logo text */
+.waiting-room::before {
+    content: "Quizzy!";
+    font-family: var(--font-display);
+    font-size: 3rem;
+    font-weight: 900;
+    color: white;
+    font-style: italic;
+}
+
+/* PIN Display Card - White card like Kahoot */
 .pin-display {
-    padding: 40px 60px;
-    margin-bottom: 20px;
+    background: white !important;
+    border-radius: 10px;
+    padding: 30px 60px;
+    text-align: center;
     position: relative;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.pin-display.glass-card {
+    background: white !important;
+    border: none !important;
+    backdrop-filter: none !important;
 }
 
 .close-btn-absolute {
     position: absolute;
-    top: 15px;
+    top: 10px;
     right: 15px;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
+    background: none;
     border: none;
-    color: var(--text-secondary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-size: 1.8rem;
+    color: #999;
     cursor: pointer;
-    transition: all var(--transition-fast);
-    font-size: 1.2rem;
     line-height: 1;
-    padding-bottom: 4px;
-    /* Center x vertically */
 }
 
 .close-btn-absolute:hover {
-    background: rgba(226, 27, 60, 0.2);
-    color: #FF6B6B;
-}
-
-.btn-text {
-    background: none;
-    border: none;
-    font-weight: 600;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: all 0.2s;
-}
-
-.btn-text.danger {
-    color: #FF6B6B;
-    background: rgba(226, 27, 60, 0.1);
-    padding: 6px 12px;
-    border-radius: var(--radius-sm);
-}
-
-.btn-text.danger:hover {
-    background: rgba(226, 27, 60, 0.2);
+    color: #666;
 }
 
 .pin-label {
     display: block;
-    font-size: 1.2rem;
-    color: var(--text-secondary);
-    margin-bottom: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #666;
+    text-transform: uppercase;
+    margin-bottom: 8px;
 }
 
 .pin-number {
     font-family: var(--font-display);
-    font-size: 5rem;
-    font-weight: 800;
-    letter-spacing: 0.2em;
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-size: 4rem;
+    font-weight: 900;
+    color: #333;
+    letter-spacing: 8px;
 }
 
 .copy-btn {
+    margin-top: 15px;
+    padding: 10px 24px;
+    background: #f0f0f0;
+    border: none;
+    border-radius: 6px;
+    font-weight: 700;
+    color: #666;
+    cursor: pointer;
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    margin-top: 16px;
-    padding: 10px 20px;
-    background: var(--bg-glass);
-    border: none;
-    border-radius: var(--radius-md);
-    color: var(--text-primary);
-    cursor: pointer;
-    transition: all var(--transition-fast);
 }
 
 .copy-btn:hover {
-    background: var(--bg-glass-hover);
+    background: #e0e0e0;
 }
 
+/* Join URL */
 .join-url {
-    color: var(--text-secondary);
-    margin-bottom: 40px;
-    font-size: 1.1rem;
+    background: white;
+    padding: 20px 40px;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    color: #666;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .join-url span {
-    color: var(--primary-cyan);
-    font-weight: 600;
+    font-weight: 900;
+    color: #333;
 }
 
+/* Players Section */
 .players-section {
+    width: 100%;
+    max-width: 900px;
     padding: 30px;
-    margin-bottom: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.players-section.glass-card {
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .players-header {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 10px;
+    gap: 12px;
     margin-bottom: 24px;
-    font-size: 1.3rem;
-    font-weight: 600;
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
 }
 
+.players-header .btn-text.danger {
+    margin-left: auto;
+    color: #ff6b6b;
+    font-weight: 700;
+}
+
+/* Player Chips - Purple boxes like Kahoot */
 .players-grid {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
     gap: 12px;
-    min-height: 60px;
+    justify-content: center;
 }
 
 .player-chip {
+    padding: 12px 24px;
+    background: var(--kahoot-purple-light) !important;
+    border-radius: 8px;
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    border-radius: 50px;
-    font-weight: 600;
+    gap: 10px;
     color: white;
+    font-weight: 700;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
 }
 
 .chip-avatar {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
 }
 
 .chip-name {
-    max-width: 120px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    font-size: 1rem;
+    text-transform: uppercase;
 }
 
 .no-players {
-    color: var(--text-muted);
-}
-
-.start-btn {
-    font-size: 1.3rem;
-    padding: 20px 50px;
-}
-
-/* Countdown Screen */
-.countdown-screen {
+    width: 100%;
     text-align: center;
+    padding: 40px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+/* Start Button - Black like Kahoot */
+.start-btn {
+    padding: 18px 50px !important;
+    background: #333 !important;
+    color: white;
+    font-size: 1.3rem;
+    font-weight: 800;
+    border-radius: 8px;
+    box-shadow: 0 6px 0 #1a1a1a !important;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.start-btn:hover {
+    background: #444 !important;
+}
+
+/* ===========================================
+   COUNTDOWN SCREEN
+   =========================================== */
+.countdown-screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
 }
 
 .countdown-number {
     font-family: var(--font-display);
-    font-size: 15rem;
+    font-size: 10rem;
     font-weight: 900;
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    line-height: 1;
+    color: white;
+    text-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
 .question-preview {
-    margin-top: 30px;
-    font-size: 1.3rem;
-    color: var(--text-secondary);
+    font-size: 1.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 700;
 }
 
-/* Question Screen */
+/* ===========================================
+   QUESTION SCREEN - White card with question
+   =========================================== */
 .question-screen {
-    width: 100%;
-    max-width: 1000px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
 }
 
 .question-header {
@@ -228,123 +265,194 @@
 }
 
 .question-count {
-    font-size: 1.2rem;
-    color: var(--text-secondary);
-}
-
-.answer-count {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 1.2rem;
-    color: var(--primary-cyan);
+    background: var(--kahoot-purple-light);
+    padding: 10px 24px;
+    border-radius: 25px;
+    font-weight: 800;
+    color: white;
+    font-size: 1.1rem;
 }
 
 .timer {
-    width: 100px;
-    height: 100px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
-    background: var(--bg-glass);
+    background: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: var(--font-display);
-    font-size: 3rem;
-    font-weight: 700;
-    border: 4px solid var(--primary-purple);
-    transition: all 0.3s;
+    font-size: 2rem;
+    font-weight: 900;
+    color: #333;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .timer.urgent {
-    border-color: var(--answer-red);
-    color: var(--answer-red);
+    background: var(--answer-red);
+    color: white;
 }
 
+.answer-count {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 700;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Question Text Card - WHITE like Kahoot */
 .question-text {
-    padding: 40px;
-    font-size: 1.8rem;
+    background: white !important;
+    color: #333 !important;
     text-align: center;
-    margin-bottom: 30px;
+    padding: 40px 60px;
+    border-radius: 10px;
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 40px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
+.question-text.glass-card {
+    background: white !important;
+    backdrop-filter: none !important;
+    border: none !important;
+}
+
+/* Answer Options Grid */
 .answers-display {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    gap: 12px;
+    flex: 1;
 }
 
 .answer-option {
+    padding: 24px 30px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 30px;
-    border-radius: var(--radius-lg);
-    font-size: 1.3rem;
-    font-weight: 600;
+    gap: 20px;
     color: white;
+    font-weight: 700;
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3);
+}
+
+.answer-option:nth-child(1) {
+    box-shadow: 0 6px 0 #b01530;
+}
+
+.answer-option:nth-child(2) {
+    box-shadow: 0 6px 0 #0f52a3;
+}
+
+.answer-option:nth-child(3) {
+    box-shadow: 0 6px 0 #a67a00;
+}
+
+.answer-option:nth-child(4) {
+    box-shadow: 0 6px 0 #1d6a09;
 }
 
 .answer-shape {
     font-size: 2rem;
 }
 
-/* Stats Screen */
+.answer-text {
+    font-size: 1.3rem;
+    flex: 1;
+}
+
+/* ===========================================
+   STATS SCREEN - Bar Chart + Player Answers
+   =========================================== */
 .stats-screen {
-    text-align: center;
-    width: 100%;
-    max-width: 900px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px;
 }
 
 .stats-title {
     font-size: 2.5rem;
+    color: white;
     margin-bottom: 40px;
-    color: var(--text-primary);
+    font-weight: 800;
 }
 
+/* Stats Grid - Horizontal bar counters like Kahoot */
 .stats-grid {
+    width: 100%;
+    max-width: 900px;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
     margin-bottom: 40px;
 }
 
 .stat-card {
-    padding: 24px;
-    border-radius: var(--radius-lg);
-    color: white;
-    text-align: left;
     position: relative;
-    overflow: hidden;
-    transform-origin: bottom;
+    padding: 20px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3);
+    min-height: 200px;
+}
+
+.stat-card:nth-child(1) {
+    box-shadow: 0 6px 0 #b01530;
+}
+
+.stat-card:nth-child(2) {
+    box-shadow: 0 6px 0 #0f52a3;
+}
+
+.stat-card:nth-child(3) {
+    box-shadow: 0 6px 0 #a67a00;
+}
+
+.stat-card:nth-child(4) {
+    box-shadow: 0 6px 0 #1d6a09;
 }
 
 .stat-card.correct {
-    box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 0 4px white, 0 6px 0 rgba(0, 0, 0, 0.3);
 }
 
 .stat-shape {
-    font-size: 1.5rem;
-    margin-bottom: 8px;
+    font-size: 2.5rem;
+    margin-bottom: 12px;
 }
 
 .stat-text {
     font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 8px;
-    min-height: 50px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 10px;
+    max-height: 60px;
+    overflow: hidden;
 }
 
 .stat-count {
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 2rem;
+    font-weight: 900;
+    margin-top: auto;
 }
 
 .stat-bar {
     position: absolute;
     bottom: 0;
     left: 0;
-    height: 4px;
+    height: 8px;
     background: rgba(255, 255, 255, 0.5);
+    border-radius: 0 0 8px 8px;
 }
 
 .correct-badge {
@@ -352,26 +460,37 @@
     top: 10px;
     right: 10px;
     background: white;
-    color: #26890C;
+    color: var(--answer-green);
     padding: 6px 12px;
-    border-radius: 20px;
+    border-radius: 15px;
     font-size: 0.85rem;
-    font-weight: 700;
+    font-weight: 800;
 }
 
-/* Leaderboard Screen */
+/* ===========================================
+   LEADERBOARD SCREEN
+   =========================================== */
 .leaderboard-screen {
-    text-align: center;
-    width: 100%;
-    max-width: 600px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px;
 }
 
 .lb-title {
     font-size: 2.5rem;
+    color: white;
     margin-bottom: 40px;
+    font-weight: 800;
 }
 
 .lb-list {
+    width: 100%;
+    max-width: 700px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
     margin-bottom: 40px;
 }
 
@@ -380,73 +499,83 @@
     align-items: center;
     gap: 16px;
     padding: 16px 24px;
-    background: var(--bg-glass);
-    border-radius: var(--radius-md);
-    margin-bottom: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    border: 2px solid transparent;
 }
 
 .lb-item.rank-1 {
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 165, 0, 0.2));
-    border: 2px solid #FFD700;
+    background: linear-gradient(90deg, rgba(255, 215, 0, 0.25), rgba(255, 255, 255, 0.1));
+    border-color: rgba(255, 215, 0, 0.4);
 }
 
 .lb-item.rank-2 {
-    background: linear-gradient(135deg, rgba(192, 192, 192, 0.3), rgba(168, 168, 168, 0.2));
-    border: 2px solid #C0C0C0;
+    background: linear-gradient(90deg, rgba(192, 192, 192, 0.25), rgba(255, 255, 255, 0.1));
+    border-color: rgba(192, 192, 192, 0.4);
 }
 
 .lb-item.rank-3 {
-    background: linear-gradient(135deg, rgba(205, 127, 50, 0.3), rgba(184, 134, 11, 0.2));
-    border: 2px solid #CD7F32;
+    background: linear-gradient(90deg, rgba(205, 127, 50, 0.25), rgba(255, 255, 255, 0.1));
+    border-color: rgba(205, 127, 50, 0.4);
 }
 
 .lb-rank {
-    width: 40px;
-    font-weight: 800;
-    font-size: 1.5rem;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: white;
+    width: 50px;
+    text-align: center;
 }
 
 .lb-avatar {
-    width: 45px;
-    height: 45px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.5rem;
+    border: 3px solid rgba(255, 255, 255, 0.3);
 }
 
 .lb-name {
     flex: 1;
-    text-align: left;
-    font-weight: 600;
-    font-size: 1.1rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: white;
 }
 
 .lb-score {
-    font-weight: 700;
-    font-size: 1.3rem;
-    color: var(--primary-cyan);
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #FFD700;
 }
 
-/* Finished Screen */
+/* ===========================================
+   FINISHED SCREEN - Winner + Podium
+   =========================================== */
 .finished-screen {
-    text-align: center;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    gap: 30px;
 }
 
 .winner-title {
     font-size: 3rem;
-    margin-bottom: 30px;
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: white;
+    font-weight: 900;
 }
 
 .winner-card {
+    background: rgba(255, 255, 255, 0.15) !important;
     padding: 40px 60px;
-    margin-bottom: 50px;
-    display: inline-block;
+    border-radius: 20px;
+    text-align: center;
+    border: 3px solid rgba(255, 215, 0, 0.5) !important;
 }
 
 .winner-avatar {
@@ -456,55 +585,57 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 3.5rem;
+    font-size: 3rem;
     margin: 0 auto 20px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    border: 4px solid #FFD700;
 }
 
 .winner-name {
-    font-family: var(--font-display);
     font-size: 2rem;
-    font-weight: 700;
+    font-weight: 800;
+    color: white;
     margin-bottom: 10px;
 }
 
 .winner-score {
     font-size: 1.5rem;
-    color: var(--primary-cyan);
+    font-weight: 700;
+    color: #FFD700;
 }
 
+/* Podium */
 .podium {
     display: flex;
-    justify-content: center;
     align-items: flex-end;
-    gap: 10px;
-    margin-bottom: 50px;
+    gap: 12px;
+    margin-top: 30px;
 }
 
 .podium-place {
-    width: 140px;
-    padding: 20px;
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    text-align: center;
+    width: 150px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+    border-radius: 15px 15px 0 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-end;
+    padding: 20px 15px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-bottom: none;
 }
 
 .podium-place.place-1 {
-    background: linear-gradient(180deg, #FFD700, #FFA500);
-    color: #1a1a1a;
+    background: linear-gradient(180deg, rgba(255, 215, 0, 0.3), rgba(255, 165, 0, 0.2));
+    border-color: rgba(255, 215, 0, 0.5);
 }
 
 .podium-place.place-2 {
-    background: linear-gradient(180deg, #C0C0C0, #A8A8A8);
-    color: #1a1a1a;
+    background: linear-gradient(180deg, rgba(192, 192, 192, 0.3), rgba(168, 168, 168, 0.2));
+    border-color: rgba(192, 192, 192, 0.5);
 }
 
 .podium-place.place-3 {
-    background: linear-gradient(180deg, #CD7F32, #B8860B);
-    color: #1a1a1a;
+    background: linear-gradient(180deg, rgba(205, 127, 50, 0.3), rgba(184, 134, 11, 0.2));
+    border-color: rgba(205, 127, 50, 0.5);
 }
 
 .podium-avatar {
@@ -514,15 +645,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;
-    margin-bottom: 10px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    font-size: 1.8rem;
+    margin-bottom: 12px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
 }
 
 .podium-name {
-    font-weight: 600;
+    font-weight: 700;
+    color: white;
+    font-size: 1rem;
     margin-bottom: 5px;
-    font-size: 0.9rem;
+    text-align: center;
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -530,38 +663,52 @@
 }
 
 .podium-score {
-    font-size: 0.85rem;
-    opacity: 0.8;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #FFD700;
     margin-bottom: 10px;
 }
 
 .podium-rank {
-    font-family: var(--font-display);
-    font-size: 2.5rem;
-    font-weight: 800;
+    font-size: 2rem;
+    font-weight: 900;
+    color: white;
+    margin-top: auto;
 }
 
-@media (max-width: 640px) {
+/* Loading */
+.loading-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--kahoot-purple);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
     .pin-number {
-        font-size: 3rem;
+        font-size: 2.5rem;
+        letter-spacing: 4px;
     }
 
-    .countdown-number {
-        font-size: 8rem;
-    }
-
-    .answers-display,
-    .stats-grid {
+    .answers-display {
         grid-template-columns: 1fr;
     }
 
-    .timer {
-        width: 70px;
-        height: 70px;
-        font-size: 2rem;
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .podium {
+        flex-direction: column;
+        align-items: center;
     }
 
     .podium-place {
-        width: 100px;
+        width: 100%;
+        max-width: 200px;
+        height: auto !important;
     }
 }

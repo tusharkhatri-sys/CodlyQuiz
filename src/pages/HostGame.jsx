@@ -432,7 +432,7 @@ export default function HostGame() {
                     </motion.div>
                 )}
 
-                {/* ANSWER STATS SCREEN */}
+                {/* ANSWER STATS SCREEN - Kahoot Style */}
                 {gameState === 'stats' && (
                     <motion.div
                         key="stats"
@@ -441,51 +441,112 @@ export default function HostGame() {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                     >
-                        <h2 className="stats-title">Time's Up!</h2>
+                        {/* Question Card - White */}
+                        <motion.div
+                            className="question-text glass-card"
+                            initial={{ y: -30 }}
+                            animate={{ y: 0 }}
+                        >
+                            {currentQuestion?.question_text}
+                            <button
+                                className="next-btn"
+                                onClick={showLeaderboard}
+                                style={{
+                                    position: 'absolute',
+                                    top: '20px',
+                                    right: '20px',
+                                    padding: '10px 20px',
+                                    background: '#333',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '5px',
+                                    fontWeight: 700,
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Next
+                            </button>
+                        </motion.div>
 
-                        <div className="stats-grid">
-                            {answerStats.map((stat, i) => (
-                                <motion.div
-                                    key={i}
-                                    className={`stat-card ${stat.is_correct ? 'correct' : ''}`}
-                                    style={{ background: stat.color }}
-                                    initial={{ scaleY: 0 }}
-                                    animate={{ scaleY: 1 }}
-                                    transition={{ delay: i * 0.15, type: 'spring' }}
-                                >
-                                    <div className="stat-shape">{stat.shape}</div>
-                                    <div className="stat-text">{stat.answer_text}</div>
-                                    <div className="stat-count">{stat.count} players</div>
+                        {/* Bar Chart - Answer counts */}
+                        <div className="bar-chart-container" style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'flex-end',
+                            gap: '12px',
+                            height: '200px',
+                            marginBottom: '30px'
+                        }}>
+                            {answerStats.map((stat, i) => {
+                                const maxCount = Math.max(...answerStats.map(s => s.count), 1)
+                                const barHeight = (stat.count / maxCount) * 150 + 40
+                                return (
                                     <motion.div
-                                        className="stat-bar"
-                                        initial={{ width: 0 }}
-                                        animate={{ width: `${stat.percentage}%` }}
-                                        transition={{ delay: 0.5, duration: 0.5 }}
-                                    />
-                                    {stat.is_correct && (
-                                        <motion.div
-                                            className="correct-badge"
-                                            initial={{ scale: 0 }}
-                                            animate={{ scale: 1 }}
-                                            transition={{ delay: 0.8, type: 'spring' }}
-                                        >
-                                            ✓ Correct
-                                        </motion.div>
-                                    )}
-                                </motion.div>
-                            ))}
+                                        key={i}
+                                        style={{
+                                            width: '80px',
+                                            height: barHeight,
+                                            background: stat.color,
+                                            borderRadius: '8px 8px 0 0',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            justifyContent: 'flex-end',
+                                            padding: '10px',
+                                            boxShadow: '0 4px 0 rgba(0,0,0,0.2)'
+                                        }}
+                                        initial={{ height: 0 }}
+                                        animate={{ height: barHeight }}
+                                        transition={{ delay: i * 0.1, type: 'spring' }}
+                                    >
+                                        <span style={{ fontSize: '1.5rem' }}>{stat.shape}</span>
+                                        <span style={{ fontWeight: 800, color: 'white' }}>{stat.count}</span>
+                                    </motion.div>
+                                )
+                            })}
                         </div>
 
-                        <motion.button
-                            className="btn btn-primary btn-large"
-                            onClick={showLeaderboard}
-                            initial={{ y: 50, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            transition={{ delay: 1 }}
-                        >
-                            <Trophy size={20} />
-                            Show Leaderboard
-                        </motion.button>
+                        {/* Player Answer Cards with ✓/✗ */}
+                        <div className="answers-display">
+                            {answerStats.map((stat, i) => {
+                                const playersWhoChoseThis = answers
+                                    .filter(a => a.question_id === currentQuestion?.id && a.selected_option_index === i)
+                                    .map(a => players.find(p => p.id === a.player_id))
+                                    .filter(Boolean)
+
+                                return (
+                                    <motion.div
+                                        key={i}
+                                        className={`answer-option ${stat.is_correct ? 'correct' : ''}`}
+                                        style={{ background: stat.color }}
+                                        initial={{ x: i % 2 === 0 ? -50 : 50, opacity: 0 }}
+                                        animate={{ x: 0, opacity: 1 }}
+                                        transition={{ delay: 0.3 + i * 0.1 }}
+                                    >
+                                        <span className="answer-shape">{stat.shape}</span>
+                                        <div style={{ flex: 1 }}>
+                                            {playersWhoChoseThis.slice(0, 3).map((player, pi) => (
+                                                <span key={pi} style={{
+                                                    fontWeight: 700,
+                                                    marginRight: 12,
+                                                    textTransform: 'uppercase'
+                                                }}>
+                                                    {player.nickname}
+                                                </span>
+                                            ))}
+                                            {playersWhoChoseThis.length > 3 && (
+                                                <span style={{ opacity: 0.7 }}>
+                                                    +{playersWhoChoseThis.length - 3} more
+                                                </span>
+                                            )}
+                                        </div>
+                                        <span style={{ fontSize: '1.5rem' }}>
+                                            {stat.is_correct ? '✓' : '✗'}
+                                        </span>
+                                    </motion.div>
+                                )
+                            })}
+                        </div>
                     </motion.div>
                 )}
 

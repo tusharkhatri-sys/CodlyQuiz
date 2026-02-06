@@ -1,166 +1,109 @@
-/* Powerups */
-.powerups-container {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-bottom: 20px;
-}
-
-.powerup-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    border-radius: 50px;
-    border: none;
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-    backdrop-filter: blur(5px);
-}
-
-.powerup-btn:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.4);
-    transform: translateY(-2px);
-}
-
-.powerup-btn.used {
-    background: rgba(0, 0, 0, 0.3);
-    color: rgba(255, 255, 255, 0.3);
-    cursor: not-allowed;
-}
-
-.powerup-btn.active {
-    background: var(--primary-cyan);
-    color: white;
-    box-shadow: 0 0 15px var(--primary-cyan);
-}
-
-.answer-btn.hidden {
-    opacity: 0.3;
-    pointer-events: none;
-    filter: grayscale(1);
-}
-
-/* Play Game Styles */
+/* Play Game Styles - Exact Kahoot Clone */
 
 .play-container {
     min-height: 100vh;
-    background: var(--bg-dark);
+    background: var(--kahoot-purple);
+    position: relative;
 }
 
+/* Game Status Bar */
+.game-status-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(0, 0, 0, 0.2);
+    z-index: 100;
+}
+
+.score-display {
+    font-weight: 800;
+    color: white;
+    font-size: 1.1rem;
+}
+
+.streak-badge {
+    background: linear-gradient(135deg, #ff6b35, #ff4500);
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-weight: 800;
+    color: white;
+    font-size: 0.9rem;
+}
+
+.mute-btn-fixed {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mute-btn-fixed:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Play States */
 .play-state {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 80px 20px 40px;
 }
 
-
-.play-status-bar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    padding: 15px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 100;
-    pointer-events: none;
-    /* Let clicks pass through */
-}
-
-.game-status-bar {
-    position: fixed;
-    top: 10px;
-    right: 15px;
-    z-index: 100;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 10px;
-    pointer-events: none;
-}
-
-.score-display {
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(10px);
-    padding: 8px 16px;
-    border-radius: 20px;
-    color: white;
-    font-weight: 700;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.streak-badge {
-    background: linear-gradient(135deg, #FFD700 0%, #FF8C00 100%);
-    color: #1a1a1a;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-weight: 800;
-    box-shadow: 0 4px 15px rgba(255, 140, 0, 0.4);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    transform-origin: center;
-    animation: streakPulse 1.5s infinite;
-}
-
-@keyframes streakPulse {
-    0% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(255, 140, 0, 0.7);
-    }
-
-    70% {
-        transform: scale(1.05);
-        box-shadow: 0 0 0 10px rgba(255, 140, 0, 0);
-    }
-
-    100% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(255, 140, 0, 0);
-    }
-}
-
-/* Waiting State */
+/* ===========================================
+   WAITING STATE - "You're in!"
+   =========================================== */
 .waiting-state {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    text-align: center;
 }
 
 .waiting-content {
     text-align: center;
-    color: white;
+    max-width: 400px;
 }
 
 .player-avatar {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
+    margin: 0 auto 24px;
     font-size: 3rem;
-    font-weight: 700;
-    margin: 0 auto 20px;
+    font-weight: 900;
+    color: white;
+    border: 4px solid rgba(255, 255, 255, 0.3);
 }
 
 .waiting-content h2 {
     font-size: 2rem;
-    margin-bottom: 10px;
+    color: white;
+    margin-bottom: 16px;
+    font-weight: 800;
 }
 
 .waiting-content p {
-    opacity: 0.8;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.2rem;
+    font-weight: 600;
     margin-bottom: 30px;
 }
 
+/* Loading Dots Animation */
 .loading-dots {
     display: flex;
     justify-content: center;
@@ -171,8 +114,8 @@
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    background: white;
-    animation: bounce 1.4s infinite ease-in-out;
+    background: rgba(255, 255, 255, 0.5);
+    animation: bounce 1.4s infinite ease-in-out both;
 }
 
 .loading-dots span:nth-child(1) {
@@ -196,120 +139,238 @@
     }
 }
 
-/* Question State */
+/* ===========================================
+   QUESTION STATE - Answer Buttons
+   =========================================== */
 .question-state {
-    background: #46178F;
+    padding-top: 80px;
 }
 
 .question-timer {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+    padding: 12px 24px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 30px;
     color: white;
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 40px;
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 30px;
 }
 
 .question-timer .urgent {
-    color: #E21B3C;
-    animation: pulse 0.5s infinite;
+    color: #ff4444;
 }
 
+/* Powerups */
+.powerups-container {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 30px;
+}
+
+.powerup-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.powerup-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.powerup-btn.used {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.powerup-btn.active {
+    background: #FFD700;
+    border-color: #FFD700;
+    color: #333;
+}
+
+/* Answer Buttons - 2x2 Grid with Kahoot Colors */
 .answer-buttons {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    gap: 12px;
     width: 100%;
-    max-width: 500px;
+    max-width: 600px;
+    flex: 1;
 }
 
 .answer-btn {
-    aspect-ratio: 1;
+    min-height: 120px;
     border: none;
-    border-radius: var(--radius-lg);
+    border-radius: 8px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
+    color: white;
+    transition: all var(--transition-fast);
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3);
 }
 
-.answer-btn:hover {
-    transform: scale(1.02);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+/* Kahoot Answer Colors */
+.answer-btn:nth-child(1) {
+    background: var(--answer-red);
+    box-shadow: 0 6px 0 #b01530;
+}
+
+.answer-btn:nth-child(2) {
+    background: var(--answer-blue);
+    box-shadow: 0 6px 0 #0f52a3;
+}
+
+.answer-btn:nth-child(3) {
+    background: var(--answer-yellow);
+    box-shadow: 0 6px 0 #a67a00;
+}
+
+.answer-btn:nth-child(4) {
+    background: var(--answer-green);
+    box-shadow: 0 6px 0 #1d6a09;
 }
 
 .answer-btn:active {
-    transform: scale(0.98);
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.3) !important;
+}
+
+.answer-btn.hidden {
+    opacity: 0.3;
+    pointer-events: none;
 }
 
 .answer-btn .shape {
-    font-size: 4rem;
-    color: white;
+    font-size: 3.5rem;
 }
 
-/* Answered State */
+/* ===========================================
+   ANSWERED STATE
+   =========================================== */
 .answered-state {
-    background: #333;
+    text-align: center;
 }
 
 .answered-icon {
-    color: white;
     margin-bottom: 20px;
-    animation: pulse 2s infinite;
+    color: rgba(255, 255, 255, 0.5);
 }
 
 .answered-state h2 {
+    font-size: 1.8rem;
     color: white;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+    font-weight: 800;
 }
 
 .answered-state p {
     color: rgba(255, 255, 255, 0.7);
+    font-size: 1.1rem;
 }
 
-/* Result State */
+/* ===========================================
+   RESULT STATE - Correct/Incorrect + Points
+   =========================================== */
 .result-state {
     text-align: center;
 }
 
 .result-state.correct {
-    background: linear-gradient(135deg, #26890C, #1a5d08);
+    background: var(--kahoot-purple);
 }
 
 .result-state.incorrect {
-    background: linear-gradient(135deg, #E21B3C, #a01429);
+    background: var(--kahoot-purple);
 }
 
 .result-icon {
-    color: white;
     margin-bottom: 20px;
+}
+
+.result-state.correct .result-icon {
+    color: var(--answer-green);
+}
+
+.result-state.correct .result-icon svg {
+    background: white;
+    border-radius: 50%;
+    padding: 10px;
+}
+
+.result-state.incorrect .result-icon {
+    color: var(--answer-red);
 }
 
 .result-state h2 {
-    color: white;
     font-size: 2.5rem;
+    color: white;
     margin-bottom: 20px;
+    font-weight: 900;
 }
 
+/* Points Earned - Dark box like Kahoot */
 .points-earned {
-    font-size: 2rem;
-    font-weight: 700;
+    display: inline-block;
+    padding: 16px 40px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 8px;
+    font-size: 1.8rem;
+    font-weight: 900;
     color: white;
     margin-bottom: 20px;
 }
 
 .current-score {
-    color: rgba(255, 255, 255, 0.8);
     font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 600;
 }
 
-/* Finished State */
+/* Answer Streak Badge */
+.streak-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    color: #FFD700;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.streak-display .streak-number {
+    background: #FFD700;
+    color: #333;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 0.9rem;
+}
+
+/* ===========================================
+   FINISHED STATE
+   =========================================== */
 .finished-state {
-    background: linear-gradient(135deg, #1a1a2e, #16213e);
     text-align: center;
-    color: white;
 }
 
 .trophy-icon {
@@ -318,44 +379,88 @@
 }
 
 .finished-state h1 {
-    font-size: 2.5rem;
-    margin-bottom: 40px;
+    font-size: 3rem;
+    color: white;
+    margin-bottom: 30px;
+    font-weight: 900;
 }
 
 .final-rank {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     padding: 30px 50px;
-    margin-bottom: 30px;
-    text-align: center;
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-radius: 20px;
+    margin-bottom: 24px;
+    border: 2px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.final-rank.glass-card {
+    background: rgba(255, 255, 255, 0.15) !important;
+    backdrop-filter: none !important;
 }
 
 .rank-label {
-    display: block;
-    color: var(--text-secondary);
-    margin-bottom: 10px;
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 600;
+    margin-bottom: 8px;
 }
 
 .rank-number {
-    font-family: var(--font-display);
     font-size: 4rem;
-    font-weight: 800;
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
+    font-weight: 900;
+    color: white;
 }
 
 .final-score {
     font-size: 1.5rem;
+    color: #FFD700;
+    font-weight: 700;
 }
 
 .final-score span {
-    font-weight: 700;
-    color: var(--primary-cyan);
+    font-size: 3rem;
+    font-weight: 900;
 }
 
+/* Loading */
+.loading-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--kahoot-purple);
+}
+
+.loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive */
 @media (max-width: 480px) {
+    .answer-buttons {
+        gap: 8px;
+    }
+
+    .answer-btn {
+        min-height: 100px;
+    }
+
     .answer-btn .shape {
-        font-size: 3rem;
+        font-size: 2.5rem;
     }
 }
