@@ -552,7 +552,7 @@
 }
 
 /* ===========================================
-   FINISHED SCREEN - Winner + Podium
+   FINISHED SCREEN - Kahoot Winner + Podium
    =========================================== */
 .finished-screen {
     min-height: 100vh;
@@ -560,22 +560,31 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 40px;
-    gap: 30px;
+    padding: 40px 20px;
+    gap: 25px;
 }
 
 .winner-title {
-    font-size: 3rem;
+    font-size: 3.5rem;
     color: white;
     font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
+/* Winner Card - Top player highlight */
 .winner-card {
     background: rgba(255, 255, 255, 0.15) !important;
-    padding: 40px 60px;
+    padding: 35px 60px;
     border-radius: 20px;
     text-align: center;
-    border: 3px solid rgba(255, 215, 0, 0.5) !important;
+    border: 3px solid rgba(255, 215, 0, 0.6) !important;
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.3);
+}
+
+.winner-card.glass-card {
+    backdrop-filter: none !important;
 }
 
 .winner-avatar {
@@ -585,95 +594,122 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 3rem;
-    margin: 0 auto 20px;
-    border: 4px solid #FFD700;
+    font-size: 3.5rem;
+    margin: 0 auto 16px;
+    border: 5px solid #FFD700;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
 }
 
 .winner-name {
     font-size: 2rem;
-    font-weight: 800;
+    font-weight: 900;
     color: white;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
 }
 
 .winner-score {
     font-size: 1.5rem;
-    font-weight: 700;
+    font-weight: 800;
     color: #FFD700;
 }
 
-/* Podium */
+/* Podium - 3 places side by side */
 .podium {
     display: flex;
     align-items: flex-end;
-    gap: 12px;
-    margin-top: 30px;
+    justify-content: center;
+    gap: 8px;
+    margin: 20px 0;
+    min-height: 220px;
 }
 
 .podium-place {
-    width: 150px;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
-    border-radius: 15px 15px 0 0;
+    width: 130px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px 15px;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    border-bottom: none;
+    padding: 20px 12px 15px;
+    border-radius: 12px 12px 0 0;
+    position: relative;
 }
 
+/* Gold - 1st place (center, tallest) */
 .podium-place.place-1 {
-    background: linear-gradient(180deg, rgba(255, 215, 0, 0.3), rgba(255, 165, 0, 0.2));
-    border-color: rgba(255, 215, 0, 0.5);
+    background: linear-gradient(180deg, #FFD700 0%, #FFA500 100%);
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+    z-index: 2;
 }
 
+/* Silver - 2nd place (left) */
 .podium-place.place-2 {
-    background: linear-gradient(180deg, rgba(192, 192, 192, 0.3), rgba(168, 168, 168, 0.2));
-    border-color: rgba(192, 192, 192, 0.5);
+    background: linear-gradient(180deg, #E8E8E8 0%, #A8A8A8 100%);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
+/* Bronze - 3rd place (right) */
 .podium-place.place-3 {
-    background: linear-gradient(180deg, rgba(205, 127, 50, 0.3), rgba(184, 134, 11, 0.2));
-    border-color: rgba(205, 127, 50, 0.5);
+    background: linear-gradient(180deg, #CD7F32 0%, #8B4513 100%);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .podium-avatar {
-    width: 60px;
-    height: 60px;
+    width: 55px;
+    height: 55px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.8rem;
-    margin-bottom: 12px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
+    margin-bottom: 10px;
+    border: 3px solid rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .podium-name {
-    font-weight: 700;
+    font-weight: 800;
     color: white;
-    font-size: 1rem;
-    margin-bottom: 5px;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
     text-align: center;
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .podium-score {
-    font-size: 1.2rem;
-    font-weight: 800;
-    color: #FFD700;
-    margin-bottom: 10px;
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: white;
+    margin-bottom: 8px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .podium-rank {
-    font-size: 2rem;
+    font-size: 2.2rem;
     font-weight: 900;
     color: white;
-    margin-top: auto;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Back to Dashboard Button */
+.finished-screen .btn-secondary {
+    padding: 16px 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    font-weight: 800;
+    font-size: 1rem;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 10px;
+}
+
+.finished-screen .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
 
 /* Loading */

@@ -612,7 +612,7 @@ export default function HostGame() {
                     </motion.div>
                 )}
 
-                {/* FINISHED SCREEN */}
+                {/* FINISHED SCREEN - Kahoot Style */}
                 {gameState === 'finished' && (
                     <motion.div
                         key="finished"
@@ -628,6 +628,7 @@ export default function HostGame() {
                             <h1 className="winner-title">🏆 WINNER 🏆</h1>
                         </motion.div>
 
+                        {/* Winner Card - Only show if we have a winner */}
                         {leaderboard[0] && (
                             <motion.div
                                 className="winner-card glass-card"
@@ -643,32 +644,35 @@ export default function HostGame() {
                             </motion.div>
                         )}
 
-                        <div className="podium">
-                            {[1, 0, 2].map((order, visualIndex) => {
-                                const player = leaderboard[order]
-                                if (!player) return null
-                                const avatar = getPlayerAvatar(player)
-                                const heights = [200, 160, 120]
+                        {/* Podium - Show all 3 places if available */}
+                        {leaderboard.length > 1 && (
+                            <div className="podium">
+                                {[1, 0, 2].map((order, visualIndex) => {
+                                    const player = leaderboard[order]
+                                    if (!player) return null
+                                    const avatar = getPlayerAvatar(player)
+                                    const heights = [180, 140, 110] // 1st, 2nd, 3rd heights
 
-                                return (
-                                    <motion.div
-                                        key={player.id}
-                                        className={`podium-place place-${order + 1}`}
-                                        style={{ height: heights[order], order: visualIndex }}
-                                        initial={{ y: 200, opacity: 0 }}
-                                        animate={{ y: 0, opacity: 1 }}
-                                        transition={{ delay: 0.5 + visualIndex * 0.2, type: 'spring' }}
-                                    >
-                                        <div className="podium-avatar" style={{ background: avatar.bg }}>
-                                            {avatar.emoji}
-                                        </div>
-                                        <div className="podium-name">{player.nickname}</div>
-                                        <div className="podium-score">{player.score}</div>
-                                        <div className="podium-rank">{order + 1}</div>
-                                    </motion.div>
-                                )
-                            })}
-                        </div>
+                                    return (
+                                        <motion.div
+                                            key={player.id}
+                                            className={`podium-place place-${order + 1}`}
+                                            style={{ height: heights[order], order: visualIndex }}
+                                            initial={{ y: 200, opacity: 0 }}
+                                            animate={{ y: 0, opacity: 1 }}
+                                            transition={{ delay: 0.5 + visualIndex * 0.2, type: 'spring' }}
+                                        >
+                                            <div className="podium-avatar" style={{ background: avatar.bg }}>
+                                                {avatar.emoji}
+                                            </div>
+                                            <div className="podium-name">{player.nickname}</div>
+                                            <div className="podium-score">{player.score}</div>
+                                            <div className="podium-rank">{order + 1}</div>
+                                        </motion.div>
+                                    )
+                                })}
+                            </div>
+                        )}
 
                         <motion.button
                             className="btn btn-secondary btn-large"
