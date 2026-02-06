@@ -18,20 +18,26 @@ export default function Dashboard() {
     }, [user])
 
     const fetchQuizzes = async () => {
-        if (!user) return
+        if (!user) {
+            setLoading(false)
+            return
+        }
 
         try {
             const { data, error } = await supabase
                 .from('quizzes')
-                .select(`
-          *,
-          questions:questions(count)
-        `)
+                .select('*, questions(count)')
                 .eq('creator_id', user.id)
                 .order('created_at', { ascending: false })
 
             if (error) throw error
-            setQuizzes(data || [])
+
+            // Transform data to include question count
+            const quizzesWithCount = (data || []).map(quiz => ({
+                ...quiz,
+                questionCount: quiz.questions?.[0]?.count || 0
+            }))
+            setQuizzes(quizzesWithCount)
         } catch (error) {
             console.error('Error fetching quizzes:', error)
         } finally {
@@ -167,7 +173,7 @@ export default function Dashboard() {
                                 <div className="quiz-info">
                                     <h3 className="quiz-title">{quiz.title}</h3>
                                     <p className="quiz-meta">
-                                        {quiz.questions?.[0]?.count || 0} questions • {quiz.play_count || 0} plays
+                                        {quiz.questionCount || 0} questions • {quiz.times_played || 0} plays
                                     </p>
                                 </div>
 

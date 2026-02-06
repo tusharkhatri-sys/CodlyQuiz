@@ -26,7 +26,7 @@ export default function AvatarShop() {
     const loadUserData = async () => {
         // Get user profile (coins, selected avatar)
         const { data: profile } = await supabase
-            .from('user_profiles')
+            .from('profiles')
             .select('coins, selected_avatar, username')
             .eq('id', user.id)
             .single()
@@ -81,7 +81,7 @@ export default function AvatarShop() {
 
     const equipAvatar = async (avatarId) => {
         await supabase
-            .from('user_profiles')
+            .from('profiles')
             .update({ selected_avatar: avatarId })
             .eq('id', user.id)
 
@@ -102,7 +102,7 @@ export default function AvatarShop() {
         <div className="shop-container">
             {/* Header */}
             <header className="shop-header">
-                <button className="back-btn" onClick={() => navigate('/dashboard')}>
+                <button className="back-btn" onClick={() => navigate(-1)}>
                     <ArrowLeft size={24} />
                 </button>
                 <h1>Avatar Shop</h1>
@@ -150,7 +150,7 @@ export default function AvatarShop() {
             <div className="avatar-grid">
                 {getFilteredAvatars().map((avatar, index) => {
                     const tier = AVATAR_TIERS[avatar.tier]
-                    const owned = isOwned(avatar.id)
+                    const owned = avatar.tier === 'FREE' || isOwned(avatar.id)
                     const equipped = isEquipped(avatar.id)
                     const price = getAvatarPrice(avatar)
 

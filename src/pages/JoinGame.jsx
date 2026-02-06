@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import { ArrowLeft, Gamepad2, Shuffle, Sparkles, User } from 'lucide-react'
-import { AVATARS, generateNickname, getRandomAvatar } from '../utils/avatars'
+import { AVATARS, generateNickname, getRandomAvatar, getFreeAvatars } from '../utils/avatars'
 import './JoinGame.css'
 
 export default function JoinGame() {
@@ -12,6 +12,7 @@ export default function JoinGame() {
     const [pin, setPin] = useState('')
     const [nickname, setNickname] = useState('')
     const [selectedAvatar, setSelectedAvatar] = useState(getRandomAvatar())
+    const [availableAvatarIds, setAvailableAvatarIds] = useState(getFreeAvatars())
     const [step, setStep] = useState(1) // 1: enter PIN, 2: choose avatar & name
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
@@ -47,14 +48,32 @@ export default function JoinGame() {
             let userAvatar = getRandomAvatar()
 
             if (user) {
+                // Fetch owned avatars
+                const { data: owned } = await supabase
+                    .from('user_avatars')
+                    .select('avatar_id')
+                    .eq('user_id', user.id)
+
+                if (owned) {
+                    const ownedIds = owned.map(o => o.avatar_id)
+                    // Combine free and owned
+                    const allUnlocked = [...new Set([...getFreeAvatars(), ...ownedIds])]
+                    setAvailableAvatarIds(allUnlocked)
+                }
+
                 const { data: profile } = await supabase
-                    .from('user_profiles')
+                    .from('profiles')
                     .select('username, selected_avatar')
                     .eq('id', user.id)
                     .single()
 
                 if (profile) {
-                    defaultNickname = profile.username || user.user_metadata?.username || defaultNickname
+                    defaultNickname = profile.username
+                        || user.user_metadata?.username
+                        || user.user_metadata?.full_name
+                        || user.user_metadata?.name
+                        || user.email?.split('@')[0]
+                        || defaultNickname
                     // Use selected avatar from profile
                     if (profile.selected_avatar) {
                         const foundAvatar = AVATARS.find(a => a.id === profile.selected_avatar)
@@ -119,7 +138,11 @@ export default function JoinGame() {
     }
 
     const randomizeAvatar = () => {
-        setSelectedAvatar(getRandomAvatar())
+        const available = AVATARS.filter(a => availableAvatarIds.includes(a.id))
+        if (available.length > 0) {
+            const random = available[Math.floor(Math.random() * available.length)]
+            setSelectedAvatar(random)
+        }
     }
 
     return (
@@ -225,7 +248,7 @@ export default function JoinGame() {
                                     </div>
 
                                     <div className="avatar-grid">
-                                        {AVATARS.map((avatar) => (
+                                        {AVATARS.filter(a => availableAvatarIds.includes(a.id)).map((avatar) => (
                                             <motion.button
                                                 key={avatar.id}
                                                 type="button"

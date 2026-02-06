@@ -72,7 +72,7 @@ export function AuthProvider({ children }) {
 
     const loadProfile = async (userId) => {
         const { data } = await supabase
-            .from('user_profiles')
+            .from('profiles')
             .select('*')
             .eq('id', userId)
             .single()

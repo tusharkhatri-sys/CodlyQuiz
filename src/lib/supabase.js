@@ -3,7 +3,13 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = 'https://prsynwfjkhtdaqluwigq.supabase.co'
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InByc3lud2Zqa2h0ZGFxbHV3aWdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyOTIwMTgsImV4cCI6MjA4NTg2ODAxOH0.BLd2VwzCzts24VhGOq0Pm-yN4Z95XINGrRbQpPBA7jY'
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Simple client without complex auth options
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+        persistSession: false,  // Disable session persistence to avoid hangs
+        autoRefreshToken: false
+    }
+})
 
 // Auth helper functions
 export const auth = {
