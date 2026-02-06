@@ -2,49 +2,52 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
 const AuthContext = createContext({})
+const SESSION_KEY = 'codlyquiz-session'
 
 export const useAuth = () => useContext(AuthContext)
+
+// Manual session helpers
+const saveSession = (session) => {
+    if (session) {
+        localStorage.setItem(SESSION_KEY, JSON.stringify(session))
+    } else {
+        localStorage.removeItem(SESSION_KEY)
+    }
+}
+
+const getSavedSession = () => {
+    try {
+        const saved = localStorage.getItem(SESSION_KEY)
+        return saved ? JSON.parse(saved) : null
+    } catch {
+        return null
+    }
+}
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null)
     const [profile, setProfile] = useState(null)
-    const [loading, setLoading] = useState(false) // DEBUG: Force false initially
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         console.log('AuthProvider mounted')
         let mounted = true
 
-        // Safety timeout - force stop loading after 3 seconds
-        const safetyTimer = setTimeout(() => {
-            if (mounted) {
-                console.warn('Auth loading timed out. FORCE SETTING LOADING FALSE.')
-                setLoading(false)
-            }
-        }, 3000)
-
         async function initSession() {
             try {
-                console.log('Supabase: Getting session...')
-                const { data: { session } } = await supabase.auth.getSession()
-                console.log('Supabase: Session retrieved', session ? 'User exists' : 'No user')
-
-                if (mounted) {
-                    setUser(session?.user ?? null)
-                    if (session?.user) {
-                        // Load profile in background, don't block app load
-                        loadProfile(session.user.id).catch(err =>
-                            console.error('Background profile load error:', err)
-                        )
-                    }
+                // Try to restore saved session first (NO Supabase auth calls!)
+                const savedSession = getSavedSession()
+                if (savedSession?.user) {
+                    console.log('Restoring saved session')
+                    setUser(savedSession.user)
+                    // Load profile in background
+                    loadProfile(savedSession.user.id).catch(console.error)
                 }
             } catch (error) {
-                console.error('Session init error:', error)
+                console.error('Session restore error:', error)
+                localStorage.removeItem(SESSION_KEY)
             } finally {
-                if (mounted) {
-                    console.log('Supabase: Init finished, setting loading false')
-                    clearTimeout(safetyTimer)
-                    setLoading(false)
-                }
+                if (mounted) setLoading(false)
             }
         }
 
@@ -53,12 +56,24 @@ export function AuthProvider({ children }) {
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             async (_event, session) => {
+                console.log('Auth change:', _event, session ? 'HAS_SESSION' : 'NO_SESSION')
+
+                // SKIP INITIAL_SESSION with null - it would clear our manually restored session
+                if (_event === 'INITIAL_SESSION' && !session) {
+                    console.log('Skipping INITIAL_SESSION with null session')
+                    return
+                }
+
                 if (mounted) {
-                    setUser(session?.user ?? null)
                     if (session?.user) {
+                        setUser(session.user)
+                        saveSession(session)
                         await loadProfile(session.user.id)
-                    } else {
+                    } else if (_event === 'SIGNED_OUT') {
+                        // Only clear on explicit sign out
+                        setUser(null)
                         setProfile(null)
+                        saveSession(null)
                     }
                 }
             }

@@ -121,6 +121,7 @@ export default function JoinGame() {
 
             navigate(`/play/${session.id}?player=${player.id}`)
         } catch (err) {
+            console.error('Join game error:', err)
             setError('Failed to join game. Please try again.')
         } finally {
             setLoading(false)

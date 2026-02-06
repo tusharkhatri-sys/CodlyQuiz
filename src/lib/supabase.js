@@ -3,11 +3,38 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = 'https://prsynwfjkhtdaqluwigq.supabase.co'
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InByc3lud2Zqa2h0ZGFxbHV3aWdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyOTIwMTgsImV4cCI6MjA4NTg2ODAxOH0.BLd2VwzCzts24VhGOq0Pm-yN4Z95XINGrRbQpPBA7jY'
 
-// Simple client without complex auth options
+const SESSION_KEY = 'codlyquiz-session'
+
+// Custom fetch that injects auth token from localStorage
+const customFetch = (url, options = {}) => {
+    // Always include apikey header
+    const headers = new Headers(options.headers || {})
+    headers.set('apikey', supabaseAnonKey)
+
+    try {
+        const saved = localStorage.getItem(SESSION_KEY)
+        if (saved) {
+            const session = JSON.parse(saved)
+            if (session?.access_token) {
+                headers.set('Authorization', `Bearer ${session.access_token}`)
+            }
+        }
+    } catch (e) {
+        console.error('Custom fetch error:', e)
+    }
+
+    options.headers = headers
+    return fetch(url, options)
+}
+
+// Client with custom fetch that injects auth token
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
-        persistSession: false,  // Disable session persistence to avoid hangs
+        persistSession: false,
         autoRefreshToken: false
+    },
+    global: {
+        fetch: customFetch
     }
 })
 

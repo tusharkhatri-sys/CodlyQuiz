@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '../lib/supabase'
 import { CheckCircle, XCircle, Trophy, Clock, Volume2, VolumeX, Zap, EyeOff, Coins } from 'lucide-react'
@@ -14,6 +14,7 @@ export default function PlayGame() {
     const { sessionId } = useParams()
     const [searchParams] = useSearchParams()
     const playerId = searchParams.get('player')
+    const navigate = useNavigate()
 
     const [session, setSession] = useState(null)
     const [player, setPlayer] = useState(null)
@@ -274,7 +275,22 @@ export default function PlayGame() {
             const playerRank = data.findIndex(p => p.id === playerId) + 1
             setRank(playerRank)
             const me = data.find(p => p.id === playerId)
-            if (me) setTotalScore(me.score)
+            if (me) {
+                setTotalScore(me.score)
+
+                // Add coins to user's profile if logged in
+                if (me.user_id) {
+                    const coinsEarned = getCoinsForRank(playerRank)
+                    console.log(`Adding ${coinsEarned} coins for rank ${playerRank}`)
+                    const { error } = await supabase.rpc('add_coins', {
+                        user_id: me.user_id,
+                        amount: coinsEarned
+                    })
+                    if (error) {
+                        console.error('Failed to add coins:', error)
+                    }
+                }
+            }
         }
     }
 
@@ -491,6 +507,18 @@ export default function PlayGame() {
                             <Coins size={24} />
                             <span>+{getCoinsForRank(rank)} coins earned!</span>
                         </motion.div>
+
+                        {/* Return Home Button */}
+                        <motion.button
+                            className="btn btn-primary return-home-btn"
+                            onClick={() => navigate('/')}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.8 }}
+                            style={{ marginTop: '2rem', padding: '1rem 2rem', fontSize: '1.1rem' }}
+                        >
+                            🏠 Return Home
+                        </motion.button>
                     </motion.div>
                 )}
             </AnimatePresence>
