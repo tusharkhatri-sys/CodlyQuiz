@@ -1,0 +1,292 @@
+/* Avatar Shop Styles - Kahoot Theme */
+
+.shop-container {
+    min-height: 100vh;
+    background: var(--kahoot-purple);
+    padding-bottom: 40px;
+}
+
+/* Header */
+.shop-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 30px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.shop-header h1 {
+    color: white;
+    font-size: 1.8rem;
+    font-weight: 800;
+}
+
+.back-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.coin-balance {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    border-radius: 30px;
+    color: #333;
+    font-weight: 900;
+    font-size: 1.3rem;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+}
+
+/* Tier Filter */
+.tier-filter {
+    display: flex;
+    gap: 10px;
+    padding: 20px 30px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.tier-btn {
+    padding: 12px 24px;
+    border-radius: 25px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.tier-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.tier-btn.active {
+    background: var(--tier-color, white);
+    border-color: var(--tier-color, white);
+    color: white;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Toast Message */
+.toast {
+    position: fixed;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 16px 32px;
+    border-radius: 12px;
+    font-weight: 700;
+    z-index: 1000;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.toast.success {
+    background: linear-gradient(135deg, #27AE60, #2ECC71);
+    color: white;
+}
+
+.toast.error {
+    background: linear-gradient(135deg, #E74C3C, #C0392B);
+    color: white;
+}
+
+/* Avatar Grid */
+.avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 20px;
+    padding: 20px 30px;
+}
+
+/* Avatar Card */
+.avatar-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 20px 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    border: 2px solid transparent;
+    transition: all 0.3s;
+}
+
+.avatar-card.owned {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.avatar-card.equipped {
+    border-color: #FFD700;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+}
+
+.avatar-card.locked {
+    opacity: 0.85;
+}
+
+/* Tier-specific card styles */
+.avatar-card.legendary {
+    background: linear-gradient(135deg, rgba(241, 196, 15, 0.2), rgba(255, 165, 0, 0.1));
+    border-color: rgba(241, 196, 15, 0.5);
+}
+
+.avatar-card.epic {
+    background: linear-gradient(135deg, rgba(155, 89, 182, 0.2), rgba(142, 68, 173, 0.1));
+    border-color: rgba(155, 89, 182, 0.5);
+}
+
+.avatar-card.rare {
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.2), rgba(41, 128, 185, 0.1));
+    border-color: rgba(52, 152, 219, 0.5);
+}
+
+/* Tier Badge */
+.tier-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Avatar Emoji */
+.avatar-emoji {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    position: relative;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.lock-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.equipped-badge {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    width: 30px;
+    height: 30px;
+    background: #27AE60;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    border: 3px solid var(--kahoot-purple);
+}
+
+/* Avatar Name */
+.avatar-name {
+    color: white;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+/* Action Buttons */
+.action-btn {
+    width: 100%;
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.buy-btn {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #333;
+    box-shadow: 0 4px 0 #CC8400;
+}
+
+.buy-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #CC8400;
+}
+
+.buy-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.equip-btn {
+    background: linear-gradient(135deg, #27AE60, #2ECC71);
+    color: white;
+    box-shadow: 0 4px 0 #1D8348;
+}
+
+.equip-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #1D8348;
+}
+
+.equipped-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: #FFD700;
+    cursor: default;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .avatar-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        padding: 15px;
+    }
+
+    .shop-header {
+        padding: 15px 20px;
+    }
+
+    .tier-filter {
+        padding: 15px 20px;
+    }
+
+    .tier-btn {
+        padding: 10px 18px;
+        font-size: 0.9rem;
+    }
+}

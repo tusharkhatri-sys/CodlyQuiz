@@ -2,13 +2,15 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
-import { Target, Gamepad2, Settings, LogOut, LayoutDashboard, Trophy } from 'lucide-react'
+import { Target, Gamepad2, Settings, LogOut, LayoutDashboard, Trophy, Coins, Store } from 'lucide-react'
+import { getAvatarById } from '../utils/avatars'
 import './Home.css'
 
 export default function Home() {
-    const { user, signOut, loading } = useAuth()
+    const { user, signOut, loading, username, coins, selectedAvatar } = useAuth()
     const [dropdownOpen, setDropdownOpen] = useState(false)
     const navigate = useNavigate()
+    const avatar = getAvatarById(selectedAvatar)
 
     useEffect(() => {
         if (!loading && !user) {
@@ -21,7 +23,6 @@ export default function Home() {
         navigate('/auth')
     }
 
-    const username = user?.user_metadata?.username || user?.email?.split('@')[0] || 'Player'
     const initial = username.charAt(0).toUpperCase()
 
     if (loading) {
@@ -46,13 +47,18 @@ export default function Home() {
                 <Link to="/" className="nav-logo text-gradient">CodlyQuiz</Link>
 
                 <div className="nav-user">
+                    <Link to="/shop" className="coin-badge">
+                        <Coins size={18} />
+                        <span>{coins}</span>
+                    </Link>
                     <span className="nav-username">{username}</span>
                     <div className="dropdown">
                         <button
                             className="nav-avatar"
+                            style={{ background: avatar?.bg || '#46178F' }}
                             onClick={() => setDropdownOpen(!dropdownOpen)}
                         >
-                            {initial}
+                            {avatar?.emoji || initial}
                         </button>
 
                         {dropdownOpen && (
@@ -66,13 +72,13 @@ export default function Home() {
                                     <LayoutDashboard size={18} />
                                     My Quizzes
                                 </Link>
+                                <Link to="/shop" className="dropdown-item">
+                                    <Store size={18} />
+                                    Avatar Shop
+                                </Link>
                                 <Link to="/leaderboard" className="dropdown-item">
                                     <Trophy size={18} />
                                     Leaderboard
-                                </Link>
-                                <Link to="/settings" className="dropdown-item">
-                                    <Settings size={18} />
-                                    Settings
                                 </Link>
                                 <div className="dropdown-divider" />
                                 <button className="dropdown-item danger" onClick={handleLogout}>
@@ -126,6 +132,14 @@ export default function Home() {
                         </div>
                         <h2 className="action-title">Join a Game</h2>
                         <p className="action-desc">Enter a game PIN to join an existing quiz session</p>
+                    </Link>
+
+                    <Link to="/shop" className="action-card glass-card shop">
+                        <div className="action-icon">
+                            <Store size={40} />
+                        </div>
+                        <h2 className="action-title">Avatar Shop</h2>
+                        <p className="action-desc">Unlock rare avatars with coins you earn</p>
                     </Link>
 
                     <Link to="/leaderboard" className="action-card glass-card leaderboard">

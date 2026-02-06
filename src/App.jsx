@@ -8,6 +8,7 @@ import JoinGame from './pages/JoinGame'
 import HostGame from './pages/HostGame'
 import PlayGame from './pages/PlayGame'
 import Leaderboard from './pages/Leaderboard'
+import AvatarShop from './pages/AvatarShop'
 import './index.css'
 
 // Protected Route Component
@@ -81,6 +82,12 @@ function App() {
           <Route path="/create" element={
             <ProtectedRoute>
               <CreateQuiz />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/shop" element={
+            <ProtectedRoute>
+              <AvatarShop />
             </ProtectedRoute>
           } />
 

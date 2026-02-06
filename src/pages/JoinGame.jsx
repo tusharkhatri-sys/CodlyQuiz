@@ -42,21 +42,29 @@ export default function JoinGame() {
 
             setSession(data)
 
-            // Fetch username from profiles table if logged in
+            // Fetch username and avatar from user_profiles table if logged in
             let defaultNickname = generateNickname()
+            let userAvatar = getRandomAvatar()
+
             if (user) {
                 const { data: profile } = await supabase
-                    .from('profiles')
-                    .select('username, display_name')
+                    .from('user_profiles')
+                    .select('username, selected_avatar')
                     .eq('id', user.id)
                     .single()
 
                 if (profile) {
-                    defaultNickname = profile.display_name || profile.username
+                    defaultNickname = profile.username || user.user_metadata?.username || defaultNickname
+                    // Use selected avatar from profile
+                    if (profile.selected_avatar) {
+                        const foundAvatar = AVATARS.find(a => a.id === profile.selected_avatar)
+                        if (foundAvatar) userAvatar = foundAvatar
+                    }
                 }
             }
 
             setNickname(defaultNickname)
+            setSelectedAvatar(userAvatar)
             setStep(2)
         } catch (err) {
             setError(err.message)

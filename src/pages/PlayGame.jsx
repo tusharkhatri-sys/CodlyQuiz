@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '../lib/supabase'
-import { CheckCircle, XCircle, Trophy, Clock, Volume2, VolumeX, Zap, EyeOff } from 'lucide-react'
+import { CheckCircle, XCircle, Trophy, Clock, Volume2, VolumeX, Zap, EyeOff, Coins } from 'lucide-react'
 import { audioManager } from '../utils/audio'
+import { getCoinsForRank } from '../utils/avatars'
 import './PlayGame.css'
 
 const ANSWER_COLORS = ['#E21B3C', '#1368CE', '#D89E00', '#26890C']
@@ -479,6 +480,17 @@ export default function PlayGame() {
                         <div className="final-score">
                             <span>{totalScore}</span> points
                         </div>
+
+                        {/* Coins Earned */}
+                        <motion.div
+                            className="coins-earned"
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ delay: 0.5, type: 'spring' }}
+                        >
+                            <Coins size={24} />
+                            <span>+{getCoinsForRank(rank)} coins earned!</span>
+                        </motion.div>
                     </motion.div>
                 )}
             </AnimatePresence>
