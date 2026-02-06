@@ -44,7 +44,7 @@
 
 /* Top bar with Kahoot logo text */
 .waiting-room::before {
-    content: "Quizzy!";
+    content: "CodlyQuiz!";
     font-family: var(--font-display);
     font-size: 3rem;
     font-weight: 900;

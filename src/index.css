@@ -1,5 +1,5 @@
 /* ============================================
-   Quizzy - Kahoot Style Theme
+   CodlyQuiz - Kahoot Style Theme
    Official Brand Colors & Design
    ============================================ */
 
@@ -88,7 +88,12 @@ body {
 }
 
 /* Typography */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-display);
   font-weight: 700;
   line-height: 1.2;
@@ -112,7 +117,8 @@ a {
 }
 
 .bg-blob {
-  display: none; /* Kahoot uses solid colors */
+  display: none;
+  /* Kahoot uses solid colors */
 }
 
 /* Text Gradient - For special headings */
@@ -252,7 +258,7 @@ a {
   pointer-events: none;
 }
 
-.input-with-icon .input-field:focus ~ .input-icon {
+.input-with-icon .input-field:focus~.input-icon {
   color: var(--kahoot-purple);
 }
 
@@ -295,9 +301,12 @@ a {
 
 /* Pulse Animation */
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.05);
   }
@@ -309,6 +318,7 @@ a {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -321,9 +331,11 @@ a {
     transform: scale(0.8);
     opacity: 0;
   }
+
   50% {
     transform: scale(1.1);
   }
+
   100% {
     transform: scale(1);
     opacity: 1;

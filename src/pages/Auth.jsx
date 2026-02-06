@@ -75,7 +75,7 @@ export default function Auth() {
             >
                 {/* Header */}
                 <div className="auth-header">
-                    <h1 className="auth-logo text-gradient">Quizzy</h1>
+                    <h1 className="auth-logo text-gradient">CodlyQuiz</h1>
                     <p className="auth-subtitle">
                         {isLogin ? "Welcome back! Let's play 🎮" : "Join the quiz revolution! 🚀"}
                     </p>

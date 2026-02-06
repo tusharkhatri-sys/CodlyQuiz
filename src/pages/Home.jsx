@@ -43,7 +43,7 @@ export default function Home() {
 
             {/* Navbar */}
             <nav className="navbar">
-                <Link to="/" className="nav-logo text-gradient">Quizzy</Link>
+                <Link to="/" className="nav-logo text-gradient">CodlyQuiz</Link>
 
                 <div className="nav-user">
                     <span className="nav-username">{username}</span>
