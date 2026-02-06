@@ -11,22 +11,38 @@ export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
+        console.log('AuthProvider mounted')
         let mounted = true
+
+        // Safety timeout - force stop loading after 3 seconds
+        const safetyTimer = setTimeout(() => {
+            if (mounted) {
+                console.warn('Auth loading timed out. FORCE SETTING LOADING FALSE.')
+                setLoading(false)
+            }
+        }, 3000)
 
         async function initSession() {
             try {
+                console.log('Supabase: Getting session...')
                 const { data: { session } } = await supabase.auth.getSession()
+                console.log('Supabase: Session retrieved', session ? 'User exists' : 'No user')
 
                 if (mounted) {
                     setUser(session?.user ?? null)
                     if (session?.user) {
-                        await loadProfile(session.user.id)
+                        // Load profile in background, don't block app load
+                        loadProfile(session.user.id).catch(err =>
+                            console.error('Background profile load error:', err)
+                        )
                     }
                 }
             } catch (error) {
                 console.error('Session init error:', error)
             } finally {
                 if (mounted) {
+                    console.log('Supabase: Init finished, setting loading false')
+                    clearTimeout(safetyTimer)
                     setLoading(false)
                 }
             }

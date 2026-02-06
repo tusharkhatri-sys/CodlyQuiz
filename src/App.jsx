@@ -50,6 +50,7 @@ function PublicRoute({ children }) {
 }
 
 function App() {
+  console.log('App rendering...')
   return (
     <AuthProvider>
       <BrowserRouter>
