@@ -11,11 +11,25 @@ export default function Dashboard() {
     const navigate = useNavigate()
     const [quizzes, setQuizzes] = useState([])
     const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
     const [activeMenu, setActiveMenu] = useState(null)
+    const [retryCount, setRetryCount] = useState(0)
 
     useEffect(() => {
-        fetchQuizzes()
-    }, [user])
+        let mounted = true
+
+        const load = async () => {
+            if (!user) {
+                if (mounted) setLoading(false)
+                return
+            }
+            await fetchQuizzes()
+        }
+
+        load()
+
+        return () => { mounted = false }
+    }, [user, retryCount])
 
     const fetchQuizzes = async () => {
         if (!user) {
@@ -23,12 +37,27 @@ export default function Dashboard() {
             return
         }
 
+        setLoading(true)
+        setError(null)
+
         try {
-            const { data, error } = await supabase
+            // Check connection first
+            const { error: healthError } = await supabase.from('quizzes').select('count', { count: 'exact', head: true })
+
+            if (healthError) throw new Error('Database connection failed')
+
+            // Helper for timeout
+            const fetchPromise = supabase
                 .from('quizzes')
                 .select('*, questions(count)')
                 .eq('creator_id', user.id)
                 .order('created_at', { ascending: false })
+
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Connection timed out. Please check your internet.')), 10000)
+            )
+
+            const { data, error } = await Promise.race([fetchPromise, timeoutPromise])
 
             if (error) throw error
 
@@ -38,8 +67,9 @@ export default function Dashboard() {
                 questionCount: quiz.questions?.[0]?.count || 0
             }))
             setQuizzes(quizzesWithCount)
-        } catch (error) {
-            console.error('Error fetching quizzes:', error)
+        } catch (err) {
+            console.error('Error fetching quizzes:', err)
+            setError(err.message || 'Failed to load quizzes')
         } finally {
             setLoading(false)
         }
@@ -114,6 +144,16 @@ export default function Dashboard() {
                 {loading ? (
                     <div className="loading-state">
                         <div className="loading-spinner" />
+                        <p>Loading your quizzes...</p>
+                    </div>
+                ) : error ? (
+                    <div className="error-state glass-card" style={{ textAlign: 'center', padding: '2rem' }}>
+                        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚠️</div>
+                        <h2>Failed to load quizzes</h2>
+                        <p style={{ color: '#ff6b6b', marginBottom: '1.5rem' }}>{error}</p>
+                        <button className="btn btn-primary" onClick={() => setRetryCount(c => c + 1)}>
+                            Try Again
+                        </button>
                     </div>
                 ) : quizzes.length === 0 ? (
                     <motion.div

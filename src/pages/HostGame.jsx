@@ -32,6 +32,9 @@ export default function HostGame() {
     const [answerStats, setAnswerStats] = useState([])
     const [countdown, setCountdown] = useState(3)
     const [coinsAwarded, setCoinsAwarded] = useState(false)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
+    const [retryCount, setRetryCount] = useState(0)
 
     const [isMuted, setIsMuted] = useState(audioManager.isMuted)
 
@@ -40,7 +43,7 @@ export default function HostGame() {
         audioManager.playBgm('lobby')
 
         return () => audioManager.stopBgm()
-    }, [])
+    }, [sessionId, retryCount])
 
     const toggleMute = () => {
         const muted = audioManager.toggleMute()
@@ -94,30 +97,50 @@ export default function HostGame() {
     }, [countdown, gameState])
 
     const fetchSessionData = async () => {
-        const { data: sessionData } = await supabase
-            .from('game_sessions')
-            .select('*, quizzes(*)')
-            .eq('id', sessionId)
-            .single()
+        setLoading(true)
+        setError(null)
+        try {
+            // Helper for timeout
+            const fetchPromise = supabase
+                .from('game_sessions')
+                .select('*, quizzes(*)')
+                .eq('id', sessionId)
+                .single()
 
-        if (sessionData) {
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Session fetch timed out')), 8000)
+            )
+
+            const { data: sessionData, error } = await Promise.race([fetchPromise, timeoutPromise])
+
+            if (error) throw error
+            if (!sessionData) throw new Error('Session not found')
+
             setSession(sessionData)
             setQuiz(sessionData.quizzes)
 
-            const { data: questionsData } = await supabase
+            // Parallel fetch for questions and players
+            const questionsPromise = supabase
                 .from('questions')
                 .select('*, answer_options(*)')
                 .eq('quiz_id', sessionData.quiz_id)
                 .order('order_index')
 
-            setQuestions(questionsData || [])
-
-            const { data: playersData } = await supabase
+            const playersPromise = supabase
                 .from('game_players')
                 .select('*')
                 .eq('session_id', sessionId)
 
-            setPlayers(playersData || [])
+            const [questionsResult, playersResult] = await Promise.all([questionsPromise, playersPromise])
+
+            setQuestions(questionsResult.data || [])
+            setPlayers(playersResult.data || [])
+
+            setLoading(false)
+        } catch (err) {
+            console.error('Error fetching session:', err)
+            setError(err.message || 'Failed to load game session.')
+            setLoading(false)
         }
     }
 
@@ -133,36 +156,57 @@ export default function HostGame() {
     }
 
     const startGame = async () => {
-        if (questions.length === 0) {
-            alert('No questions in this quiz!')
-            return
+        try {
+            if (questions.length === 0) {
+                alert('No questions in this quiz!')
+                return
+            }
+
+            // Set immediately for UI
+            setCurrentIndex(0)
+            setCurrentQuestion(questions[0])
+            setGameState('countdown')
+            setCountdown(3)
+            audioManager.playSfx('start')
+            audioManager.playBgm('game')
+
+            // Update DB to 'countdown' so players see preview
+            const { error } = await supabase
+                .from('game_sessions')
+                .update({
+                    status: 'countdown',
+                    current_question_index: 0
+                })
+                .eq('id', sessionId)
+
+            if (error) throw error
+
+        } catch (error) {
+            console.error('Error starting game:', error)
+            alert('Failed to start game. Check console for details.')
         }
-
-        await supabase
-            .from('game_sessions')
-            .update({ status: 'playing', current_question_index: 0 })
-            .eq('id', sessionId)
-
-        setCurrentIndex(0)
-        setGameState('countdown')
-        setCountdown(3)
-        audioManager.playSfx('start')
-        audioManager.playBgm('game')
     }
 
     const showQuestion = async () => {
-        setCurrentQuestion(questions[currentIndex])
-        setTimeLeft(questions[currentIndex].time_limit)
-        setGameState('question')
-        setAnswers([])
+        try {
+            setCurrentQuestion(questions[currentIndex])
+            setTimeLeft(questions[currentIndex].time_limit)
+            setGameState('question')
+            setAnswers([])
 
-        await supabase
-            .from('game_sessions')
-            .update({
-                current_question_index: currentIndex,
-                question_started_at: new Date().toISOString()
-            })
-            .eq('id', sessionId)
+            const { error } = await supabase
+                .from('game_sessions')
+                .update({
+                    status: 'playing', // Switch to playing when countdown ends
+                    current_question_index: currentIndex,
+                    question_started_at: new Date().toISOString()
+                })
+                .eq('id', sessionId)
+
+            if (error) throw error
+        } catch (error) {
+            console.error('Error showing question:', error)
+        }
     }
 
     const showAnswerStats = () => {
@@ -188,32 +232,24 @@ export default function HostGame() {
     }
 
     const showLeaderboard = async () => {
-        // Update scores in database
-        const q = questions[currentIndex]
-        const questionAnswers = answers.filter(a => a.question_id === q.id)
+        try {
+            // Player scores are updated by players themselves in PlayGame.jsx
+            // Host just needs to fetch the latest scores
 
-        for (const answer of questionAnswers) {
-            if (answer.is_correct && answer.points_earned > 0) {
-                const player = players.find(p => p.id === answer.player_id)
-                if (player) {
-                    await supabase
-                        .from('game_players')
-                        .update({ score: (player.score || 0) + answer.points_earned })
-                        .eq('id', answer.player_id)
-                }
-            }
+            const { data, error } = await supabase
+                .from('game_players')
+                .select('*')
+                .eq('session_id', sessionId)
+                .order('score', { ascending: false })
+
+            if (error) throw error
+
+            setLeaderboard(data || [])
+            setPlayers(data || []) // Update local player list with new scores
+            setGameState('leaderboard')
+        } catch (error) {
+            console.error('Error updating leaderboard:', error)
         }
-
-        // Fetch updated scores
-        const { data } = await supabase
-            .from('game_players')
-            .select('*')
-            .eq('session_id', sessionId)
-            .order('score', { ascending: false })
-
-        setLeaderboard(data || [])
-        setPlayers(data || [])
-        setGameState('leaderboard')
     }
 
     // Award Coins when game finishes
@@ -242,60 +278,110 @@ export default function HostGame() {
         }
     }
 
-    const nextQuestion = () => {
+    const nextQuestion = async () => {
         const nextIdx = currentIndex + 1
 
         if (nextIdx >= questions.length) {
             finishGame()
         } else {
             setCurrentIndex(nextIdx)
+            setCurrentQuestion(questions[nextIdx]) // Pre-load
             setGameState('countdown')
             setCountdown(3)
+
+            // Update DB to 'countdown' for preview
+            try {
+                await supabase
+                    .from('game_sessions')
+                    .update({
+                        status: 'countdown',
+                        current_question_index: nextIdx
+                    })
+                    .eq('id', sessionId)
+            } catch (err) {
+                console.error("Error syncing next question countdown:", err)
+            }
         }
     }
 
     const finishGame = async () => {
-        await supabase
-            .from('game_sessions')
-            .update({ status: 'finished', ended_at: new Date().toISOString() })
-            .eq('id', sessionId)
+        try {
+            const { error } = await supabase
+                .from('game_sessions')
+                .update({ status: 'finished', ended_at: new Date().toISOString() })
+                .eq('id', sessionId)
 
-        // Update player stats
-        // Update player stats (Commented out as RPC might not exist yet)
-        /*
-        for (let i = 0; i < leaderboard.length; i++) {
-            const player = leaderboard[i]
-            if (player.user_id) {
-                const isWinner = i === 0
-                try {
-                    await supabase.rpc('update_player_stats', {
-                        p_user_id: player.user_id,
-                        p_points: player.score,
-                        p_is_winner: isWinner
-                    })
-                } catch (err) {
-                    console.error('Failed to update stats', err)
-                }
-            }
+            if (error) throw error
+
+            setGameState('finished')
+        } catch (error) {
+            console.error('Error finishing game:', error)
         }
-        */
-
-        setGameState('finished')
     }
 
     const endGame = async () => {
         if (isClosing) return
         setIsClosing(true)
 
-        // Update session status to closed to kick players
-        await supabase
-            .from('game_sessions')
-            .update({ status: 'closed' })
-            .eq('id', sessionId)
+        try {
+            // Update session status to closed to kick players
+            const { error } = await supabase
+                .from('game_sessions')
+                .update({ status: 'closed' })
+                .eq('id', sessionId)
 
-        navigate('/dashboard')
+            if (error) throw error
+
+            navigate('/dashboard')
+        } catch (error) {
+            console.error('Error closing lobby:', error)
+            // Navigate anyway so host isn't stuck
+            navigate('/dashboard')
+        }
     }
 
+    if (loading) {
+        return (
+            <div className="host-container">
+                <div className="loading-screen" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+                    <div className="loading-spinner" />
+                    <p style={{ marginTop: '1rem', color: 'white' }}>Loading game session...</p>
+                </div>
+            </div>
+        )
+    }
+
+    if (error) {
+        return (
+            <div className="host-container">
+                <div className="error-screen" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', color: 'white', textAlign: 'center' }}>
+                    <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>⚠️</div>
+                    <h1>Connection Error</h1>
+                    <p style={{ marginBottom: '2rem', maxWidth: '400px' }}>{error}</p>
+                    <button
+                        className="btn btn-primary"
+                        onClick={() => {
+                            setLoading(true)
+                            setError(null)
+                            setRetryCount(c => c + 1)
+                        }}
+                        style={{ padding: '1rem 2rem', fontSize: '1.2rem' }}
+                    >
+                        Try Again
+                    </button>
+                    <button
+                        className="btn btn-secondary"
+                        onClick={() => navigate('/dashboard')}
+                        style={{ marginTop: '1rem' }}
+                    >
+                        Back to Dashboard
+                    </button>
+                </div>
+            </div>
+        )
+    }
+
+    // If not loading and no error, but session/quiz data is still missing (e.g., due to a very specific edge case or initial fetch issue not caught by error)
     if (!session || !quiz) {
         return (
             <div className="host-container">
@@ -448,7 +534,14 @@ export default function HostGame() {
                         </motion.div>
 
                         <div className="answers-display">
-                            {currentQuestion.answer_options
+                            {(!currentQuestion.answer_options || currentQuestion.answer_options.length === 0) && (
+                                <div style={{ color: 'white', fontSize: '1.5rem', gridColumn: '1 / -1', textAlign: 'center' }}>
+                                    ⚠️ No options data found for these question.
+                                    <br /><span style={{ fontSize: '1rem', opacity: 0.8 }}>(Check console for details)</span>
+                                </div>
+                            )}
+                            {console.log('Rendering Question:', currentQuestion)}
+                            {(currentQuestion.answer_options || [])
                                 .sort((a, b) => a.option_index - b.option_index)
                                 .map((option, i) => (
                                     <motion.div
@@ -544,11 +637,7 @@ export default function HostGame() {
                         {/* Player Answer Cards with ✓/✗ */}
                         <div className="answers-display">
                             {answerStats.map((stat, i) => {
-                                const playersWhoChoseThis = answers
-                                    .filter(a => a.question_id === currentQuestion?.id && a.selected_option_index === i)
-                                    .map(a => players.find(p => p.id === a.player_id))
-                                    .filter(Boolean)
-
+                                const option = currentQuestion.answer_options.find(o => o.option_index === i)
                                 return (
                                     <motion.div
                                         key={i}
@@ -559,22 +648,10 @@ export default function HostGame() {
                                         transition={{ delay: 0.3 + i * 0.1 }}
                                     >
                                         <span className="answer-shape">{stat.shape}</span>
-                                        <div style={{ flex: 1 }}>
-                                            {playersWhoChoseThis.slice(0, 3).map((player, pi) => (
-                                                <span key={pi} style={{
-                                                    fontWeight: 700,
-                                                    marginRight: 12,
-                                                    textTransform: 'uppercase'
-                                                }}>
-                                                    {player.nickname}
-                                                </span>
-                                            ))}
-                                            {playersWhoChoseThis.length > 3 && (
-                                                <span style={{ opacity: 0.7 }}>
-                                                    +{playersWhoChoseThis.length - 3} more
-                                                </span>
-                                            )}
-                                        </div>
+                                        <span className="answer-text" style={{ flex: 1, fontWeight: 700, fontSize: '1.2rem' }}>
+                                            {option?.answer_text || 'Loading...'}
+                                        </span>
+
                                         <span style={{ fontSize: '1.5rem' }}>
                                             {stat.is_correct ? '✓' : '✗'}
                                         </span>

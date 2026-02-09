@@ -5,9 +5,10 @@ import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
 import {
     ArrowLeft, Plus, Trash2, Save, Clock,
-    CheckCircle, Image, GripVertical
+    CheckCircle, Image, GripVertical, FileDown
 } from 'lucide-react'
 import './CreateQuiz.css'
+import QuestionBankModal from '../components/QuestionBankModal'
 
 const ANSWER_COLORS = ['#E21B3C', '#1368CE', '#D89E00', '#26890C']
 const ANSWER_SHAPES = ['▲', '◆', '●', '■']
@@ -27,6 +28,7 @@ export default function CreateQuiz() {
     const [error, setError] = useState('')
     const [isEditing, setIsEditing] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [showBankModal, setShowBankModal] = useState(false)
 
     function createEmptyQuestion() {
         return {
@@ -53,11 +55,19 @@ export default function CreateQuiz() {
     const loadQuiz = async (quizId) => {
         setLoading(true)
         try {
-            const { data: quiz, error: quizError } = await supabase
+
+            // Helper for timeout
+            const quizPromise = supabase
                 .from('quizzes')
                 .select('*')
                 .eq('id', quizId)
                 .single()
+
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Quiz load timed out')), 8000)
+            )
+
+            const { data: quiz, error: quizError } = await Promise.race([quizPromise, timeoutPromise])
 
             if (quizError) throw quizError
 
@@ -147,6 +157,47 @@ export default function CreateQuiz() {
         setQuestions(newQuestions)
     }
 
+    const importQuestions = (importedQuestions) => {
+        const newQuestions = importedQuestions.map(q => {
+            // SHUFFLE LOGIC
+            // 1. Get options from DB
+            let options = q.answer_options.map(o => ({
+                text: o.answer_text,
+                isCorrect: o.is_correct,
+                dbId: null // New question, so null DB ID
+            }))
+
+            // 2. Shuffle array
+            for (let i = options.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [options[i], options[j]] = [options[j], options[i]];
+            }
+
+            // 3. Ensure 4 options by padding
+            while (options.length < 4) {
+                options.push({ text: '', isCorrect: false, dbId: null })
+            }
+            options = options.slice(0, 4)
+
+            return {
+                id: Date.now() + Math.random(),
+                dbId: null, // Treat as new
+                text: q.question_text,
+                points: q.points,
+                options: options
+            }
+        })
+
+        // Append to existing
+        // If current list has only 1 empty question, replace it
+        if (questions.length === 1 && !questions[0].text) {
+            setQuestions(newQuestions)
+            setActiveQuestion(0)
+        } else {
+            setQuestions([...questions, ...newQuestions])
+        }
+    }
+
     const validateQuiz = () => {
         if (!title.trim()) return 'Please enter a quiz title'
 
@@ -159,8 +210,13 @@ export default function CreateQuiz() {
                 return `Question ${i + 1} needs at least 2 answer options`
             }
 
-            if (!q.options.some(o => o.isCorrect)) {
+            const correctOption = q.options.find(o => o.isCorrect)
+            if (!correctOption) {
                 return `Question ${i + 1} needs a correct answer`
+            }
+
+            if (!correctOption.text.trim()) {
+                return `Question ${i + 1}: The correct answer cannot be empty`
             }
         }
 
@@ -252,9 +308,10 @@ export default function CreateQuiz() {
             }
 
             navigate('/dashboard')
+            navigate('/dashboard')
         } catch (err) {
             console.error('Error saving quiz:', err)
-            setError('Failed to save quiz. Please try again.')
+            setError(err.message || 'Failed to save quiz. Please try again.')
         } finally {
             setSaving(false)
         }
@@ -341,8 +398,11 @@ export default function CreateQuiz() {
                 <aside className="question-sidebar glass-card">
                     <div className="sidebar-header">
                         <span>Questions</span>
-                        <button className="add-btn" onClick={addQuestion}>
+                        <button className="add-btn" onClick={addQuestion} title="Add New Question">
                             <Plus size={18} />
+                        </button>
+                        <button className="add-btn import-btn-sidebar" onClick={() => setShowBankModal(true)} title="Import from Bank">
+                            <FileDown size={18} />
                         </button>
                     </div>
 
@@ -425,6 +485,12 @@ export default function CreateQuiz() {
                     </AnimatePresence>
                 </main>
             </div>
-        </div>
+
+            <QuestionBankModal
+                isOpen={showBankModal}
+                onClose={() => setShowBankModal(false)}
+                onImport={importQuestions}
+            />
+        </div >
     )
 }

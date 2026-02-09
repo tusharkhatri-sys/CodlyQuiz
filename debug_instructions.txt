@@ -1,0 +1,18 @@
+
+import { createClient } from '@supabase/supabase-js'
+
+// You'll need to provide your URL and Key if environment variables aren't set
+// But since this runs in the user's environment where the app works, we assume env vars might be available or we can try to load them?
+// Actually, reading .env is safer.
+// For now, I'll assume the user can run this or I can inspect the output.
+
+// NOTE: This script is intended to be run via 'node' if the user has packages installed.
+// If not, we might fail. But let's try to just output instructions or use the existing 'src/lib/supabase.js' if we can import it?
+// We can't import ES modules easily in a standalone script without package.json "type": "module".
+// The project has vite, so it's likely ES modules.
+
+console.log("To verify data, please open your browser's console (F12) in the Dashboard/Host page and run:");
+console.log(`
+  const { data } = await supabase.from('questions').select('*, answer_options(*)').limit(1);
+  console.log(data);
+`);

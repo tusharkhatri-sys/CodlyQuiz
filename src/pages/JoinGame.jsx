@@ -8,7 +8,7 @@ import { AVATARS, generateNickname, getRandomAvatar, getFreeAvatars } from '../u
 import './JoinGame.css'
 
 export default function JoinGame() {
-    const { user } = useAuth()
+    const { user, loading: authLoading } = useAuth()
     const [pin, setPin] = useState('')
     const [nickname, setNickname] = useState('')
     const [selectedAvatar, setSelectedAvatar] = useState(getRandomAvatar())
@@ -21,6 +21,10 @@ export default function JoinGame() {
 
     const handlePinSubmit = async (e) => {
         e.preventDefault()
+
+        // Wait for auth to initialize before checking pin
+        if (authLoading) return
+
         if (pin.length !== 6) {
             setError('Game PIN must be 6 digits')
             return
@@ -48,6 +52,7 @@ export default function JoinGame() {
             let userAvatar = getRandomAvatar()
 
             if (user) {
+                console.log('User is logged in:', user.id)
                 // Fetch owned avatars
                 const { data: owned } = await supabase
                     .from('user_avatars')
@@ -61,32 +66,43 @@ export default function JoinGame() {
                     setAvailableAvatarIds(allUnlocked)
                 }
 
-                const { data: profile } = await supabase
+                const { data: profile, error: profileError } = await supabase
                     .from('profiles')
                     .select('username, selected_avatar')
                     .eq('id', user.id)
                     .single()
 
+                console.log('Profile fetch result:', { profile, profileError })
+
                 if (profile) {
-                    defaultNickname = profile.username
-                        || user.user_metadata?.username
-                        || user.user_metadata?.full_name
-                        || user.user_metadata?.name
-                        || user.email?.split('@')[0]
-                        || defaultNickname
+                    if (profile.username) {
+                        defaultNickname = profile.username
+                        console.log('Using profile username:', defaultNickname)
+                    }
+
                     // Use selected avatar from profile
                     if (profile.selected_avatar) {
                         const foundAvatar = AVATARS.find(a => a.id === profile.selected_avatar)
-                        if (foundAvatar) userAvatar = foundAvatar
+                        if (foundAvatar) {
+                            userAvatar = foundAvatar
+                            console.log('Using profile avatar:', userAvatar.id)
+                        }
                     }
                 }
+            } else {
+                console.log('User is NOT logged in, using defaults')
             }
 
             setNickname(defaultNickname)
             setSelectedAvatar(userAvatar)
             setStep(2)
         } catch (err) {
-            setError(err.message)
+            console.error('Error joining session:', err)
+            if (err.code === 'PGRST116') {
+                setError('Game not found. Check the PIN and try again.')
+            } else {
+                setError(err.message || 'Failed to join session')
+            }
         } finally {
             setLoading(false)
         }
@@ -122,7 +138,7 @@ export default function JoinGame() {
             navigate(`/play/${session.id}?player=${player.id}`)
         } catch (err) {
             console.error('Join game error:', err)
-            setError('Failed to join game. Please try again.')
+            setError(err.message || 'Failed to join game. Please try again.')
         } finally {
             setLoading(false)
         }
@@ -196,17 +212,11 @@ export default function JoinGame() {
 
                                 <button
                                     type="submit"
-                                    className="btn btn-primary btn-block btn-large"
-                                    disabled={loading || pin.length !== 6}
+                                    className="btn btn-primary btn-large"
+                                    disabled={loading || authLoading}
+                                    style={{ width: '100%' }}
                                 >
-                                    {loading ? (
-                                        <div className="spinner" />
-                                    ) : (
-                                        <>
-                                            <span>Enter</span>
-                                            <ArrowLeft size={20} style={{ transform: 'rotate(180deg)' }} />
-                                        </>
-                                    )}
+                                    {loading || authLoading ? 'Joining...' : 'Enter Game'}
                                 </button>
                             </form>
                         </motion.div>

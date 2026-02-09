@@ -178,40 +178,46 @@
     transform: translateY(-2px);
 }
 
-/* Avatar Grid */
+/* Avatar Grid - Responsive & Larger */
 .avatar-section {
-    margin-bottom: 24px;
+    margin-bottom: 32px;
 }
 
 .avatar-grid {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 16px;
+    justify-content: center;
 }
 
 .avatar-option {
     aspect-ratio: 1;
     border-radius: var(--radius-md);
-    border: 3px solid transparent;
+    border: 4px solid transparent;
+    /* Thicker border */
     cursor: pointer;
-    font-size: 1.5rem;
+    font-size: 3rem;
+    /* Much larger emoji */
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all var(--transition-fast);
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
 }
 
 .avatar-option:hover {
-    border-color: rgba(255, 255, 255, 0.5);
-    transform: scale(1.1);
-    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: translateY(-4px);
+    /* Lift effect */
+    background: rgba(255, 255, 255, 0.25);
 }
 
 .avatar-option.selected {
     border-color: white;
-    background: rgba(255, 255, 255, 0.3);
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.5);
+    /* Glow effect */
+    transform: scale(1.1);
 }
 
 /* Nickname */

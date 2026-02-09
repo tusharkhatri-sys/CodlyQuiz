@@ -116,18 +116,22 @@ export default function PlayGame() {
     }
 
     const handleSessionUpdate = async (newSession) => {
-        setSession(newSession)
+        try {
+            setSession(newSession)
 
-        if (newSession.status === 'playing') {
-            // loadCurrentQuestion will set appropriate gameState
-            await loadCurrentQuestion(newSession)
-        } else if (newSession.status === 'finished') {
-            fetchFinalRank()
-            setGameState('finished')
-        } else if (newSession.status === 'cancelled' || newSession.status === 'closed') {
-            // Session closed by host - kick player
-            alert('Game session has been closed by the host!')
-            navigate('/join')
+            if (newSession.status === 'playing' || newSession.status === 'countdown') {
+                // loadCurrentQuestion will set appropriate gameState
+                await loadCurrentQuestion(newSession)
+            } else if (newSession.status === 'finished') {
+                fetchFinalRank()
+                setGameState('finished')
+            } else if (newSession.status === 'cancelled' || newSession.status === 'closed') {
+                // Session closed by host - kick player
+                alert('Game session has been closed by the host!')
+                navigate('/join')
+            }
+        } catch (error) {
+            console.error('Error handling session update:', error)
         }
     }
 
@@ -164,7 +168,19 @@ export default function PlayGame() {
             setOptions(q.answer_options.sort((a, b) => a.option_index - b.option_index))
             setTimeLeft(q.time_limit)
             setQuestionStartTime(Date.now())
-            setGameState('question')
+            setCurrentQuestion(q)
+            setOptions(q.answer_options.sort((a, b) => a.option_index - b.option_index))
+
+            // Set state based on session status
+            if (sessionData.status === 'countdown') {
+                setGameState('countdown')
+                setTimeLeft(3) // Visual placeholder
+            } else {
+                setTimeLeft(q.time_limit)
+                setQuestionStartTime(Date.now())
+                setGameState('question')
+            }
+
             setSelectedAnswer(null)
             setIsCorrect(null)
         }
@@ -196,101 +212,104 @@ export default function PlayGame() {
     const submitAnswer = async (optionIndex) => {
         if (selectedAnswer !== null) return // Already answered
 
-        setSelectedAnswer(optionIndex)
-        setGameState('answered')
+        try {
+            setSelectedAnswer(optionIndex)
+            setGameState('answered')
 
-        const timeTaken = Date.now() - questionStartTime
-        const correctOption = options.find(o => o.is_correct)
-        const correct = optionIndex !== null && options[optionIndex]?.is_correct
+            const timeTaken = Date.now() - questionStartTime
+            const correctOption = options.find(o => o.is_correct)
+            const correct = optionIndex !== null && options[optionIndex]?.is_correct
 
-        setIsCorrect(correct)
+            setIsCorrect(correct)
 
-        // Play sound effect
-        if (correct) {
-            audioManager.playSfx('correct')
-        } else {
-            audioManager.playSfx('wrong')
-        }
+            // Play sound effect
+            if (correct) {
+                audioManager.playSfx('correct')
+            } else {
+                audioManager.playSfx('wrong')
+            }
 
-        // Update local streak state
-        let newStreak = streak
-        if (correct) {
-            newStreak += 1
-        } else {
-            newStreak = 0
-        }
-        setStreak(newStreak)
+            // Update local streak state
+            let newStreak = streak
+            if (correct) {
+                newStreak += 1
+            } else {
+                newStreak = 0
+            }
+            setStreak(newStreak)
 
-        // Calculate points (faster = more points)
-        let points = 0
-        if (correct) {
-            const maxTime = currentQuestion.time_limit * 1000
-            const timeBonus = Math.max(0, 1 - (timeTaken / maxTime))
-            let basePoints = Math.round(currentQuestion.points * (0.5 + 0.5 * timeBonus))
+            let points = 0
+            if (correct) {
 
-            // Streak Multiplier
-            let multiplier = 1
-            if (newStreak >= 5) multiplier = 2
-            else if (newStreak >= 3) multiplier = 1.5
-            else if (newStreak >= 2) multiplier = 1.2
+                // Calculate points purely based on speed (Max 1000)
+                // Formula: Base points (1000) * Time Factor
+                const maxTime = currentQuestion.time_limit * 1000
+                const timeBonus = Math.max(0, 1 - (timeTaken / maxTime))
 
-            points = Math.round(basePoints * multiplier * activeMultiplier)
-        }
-        setPointsEarned(points)
+                // Score ranges from 500 (slowest) to 1000 (fastest)
+                points = Math.round(currentQuestion.points * (0.5 + 0.5 * timeBonus))
 
-        // Save answer to database
-        await supabase.from('player_answers').insert({
-            player_id: playerId,
-            question_id: currentQuestion.id,
-            selected_option_index: optionIndex,
-            is_correct: correct,
-            time_taken_ms: timeTaken,
-            points_earned: points
-        })
+                // Multipliers (Streak/Powerups) removed from SCORE to keep it under 1000.
+                // You might want to apply them to Coins instead?
+                // For now, strict adherence to "Max 1000 Score".
+            }
+            setPointsEarned(points)
 
-        // Update player score and streak
-        // Always update to save streak even if points is 0
-        const newScore = totalScore + points
-        setTotalScore(newScore)
-
-        await supabase
-            .from('game_players')
-            .update({
-                score: newScore,
-                current_streak: newStreak
+            // Save answer to database
+            const { error: answerError } = await supabase.from('player_answers').insert({
+                player_id: playerId,
+                question_id: currentQuestion.id,
+                selected_option_index: optionIndex,
+                is_correct: correct,
+                time_taken_ms: timeTaken,
+                points_earned: points
             })
-            .eq('id', playerId)
 
-        setGameState('result')
+            if (answerError) throw answerError
+
+            // Update player score and streak
+            // Always update to save streak even if points is 0
+            const newScore = totalScore + points
+            setTotalScore(newScore)
+
+            const { error: playerError } = await supabase
+                .from('game_players')
+                .update({
+                    score: newScore,
+                    current_streak: newStreak
+                })
+                .eq('id', playerId)
+
+            if (playerError) throw playerError
+
+            setGameState('result')
+        } catch (error) {
+            console.error('Error submitting answer:', error)
+            // Optionally revert UI state or show error
+        }
     }
 
     const fetchFinalRank = async () => {
-        const { data } = await supabase
-            .from('game_players')
-            .select('*')
-            .eq('session_id', sessionId)
-            .order('score', { ascending: false })
+        try {
+            const { data, error } = await supabase
+                .from('game_players')
+                .select('*')
+                .eq('session_id', sessionId)
+                .order('score', { ascending: false })
 
-        if (data) {
-            const playerRank = data.findIndex(p => p.id === playerId) + 1
-            setRank(playerRank)
-            const me = data.find(p => p.id === playerId)
-            if (me) {
-                setTotalScore(me.score)
+            if (error) throw error
 
-                // Add coins to user's profile if logged in
-                if (me.user_id) {
-                    const coinsEarned = getCoinsForRank(playerRank)
-                    console.log(`Adding ${coinsEarned} coins for rank ${playerRank}`)
-                    const { error } = await supabase.rpc('add_coins', {
-                        user_id: me.user_id,
-                        amount: coinsEarned
-                    })
-                    if (error) {
-                        console.error('Failed to add coins:', error)
-                    }
+            if (data) {
+                const playerRank = data.findIndex(p => p.id === playerId) + 1
+                setRank(playerRank)
+                const me = data.find(p => p.id === playerId)
+                if (me) {
+                    setTotalScore(me.score)
+                    // Coin awarding is handled by HostGame.jsx now to prevent double coins
                 }
             }
+        } catch (error) {
+            console.error('Error fetching final rank:', error)
         }
     }
 
@@ -327,6 +346,36 @@ export default function PlayGame() {
             </div>
 
             <AnimatePresence mode="wait">
+                {/* COUNTDOWN / PREVIEW STATE */}
+                {gameState === 'countdown' && (
+                    <motion.div
+                        key="countdown"
+                        className="play-state countdown-state"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                    >
+                        <div className="countdown-content" style={{ textAlign: 'center', padding: '2rem' }}>
+                            <h2>Get Ready!</h2>
+                            <div className="loading-dots">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                            {currentQuestion && (
+                                <motion.div
+                                    className="preview-question glass-card"
+                                    initial={{ y: 20, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    style={{ marginTop: '2rem', padding: '1.5rem', background: 'rgba(255,255,255,0.1)' }}
+                                >
+                                    <h3>{currentQuestion.question_text}</h3>
+                                </motion.div>
+                            )}
+                        </div>
+                    </motion.div>
+                )}
+
                 {/* WAITING STATE */}
                 {gameState === 'waiting' && (
                     <motion.div

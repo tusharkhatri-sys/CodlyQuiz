@@ -3,99 +3,40 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = 'https://prsynwfjkhtdaqluwigq.supabase.co'
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InByc3lud2Zqa2h0ZGFxbHV3aWdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyOTIwMTgsImV4cCI6MjA4NTg2ODAxOH0.BLd2VwzCzts24VhGOq0Pm-yN4Z95XINGrRbQpPBA7jY'
 
-const SESSION_KEY = 'codlyquiz-session'
+const customFetch = (url, options) => {
+    return new Promise((resolve, reject) => {
+        const fetchWithRetry = (retries) => {
+            const controller = new AbortController()
+            const id = setTimeout(() => controller.abort(), 10000) // 10s global timeout
 
-// Custom fetch that injects auth token from localStorage
-const customFetch = (url, options = {}) => {
-    // Always include apikey header
-    const headers = new Headers(options.headers || {})
-    headers.set('apikey', supabaseAnonKey)
-
-    try {
-        const saved = localStorage.getItem(SESSION_KEY)
-        if (saved) {
-            const session = JSON.parse(saved)
-            if (session?.access_token) {
-                headers.set('Authorization', `Bearer ${session.access_token}`)
-            }
+            fetch(url, { ...options, signal: controller.signal })
+                .then(response => {
+                    clearTimeout(id)
+                    resolve(response)
+                })
+                .catch((error) => {
+                    clearTimeout(id)
+                    console.warn('Supabase fetch error:', error.message)
+                    if (retries > 0 && error.name !== 'AbortError') {
+                        // Retry on network errors, but maybe not on timeouts if we want to fail fast?
+                        // Let's retry on timeouts too, simply.
+                        setTimeout(() => fetchWithRetry(retries - 1), 1000)
+                    } else {
+                        reject(error)
+                    }
+                })
         }
-    } catch (e) {
-        console.error('Custom fetch error:', e)
-    }
-
-    options.headers = headers
-    return fetch(url, options)
+        fetchWithRetry(3)
+    })
 }
 
-// Client with custom fetch that injects auth token
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
-        persistSession: false,
-        autoRefreshToken: false
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
     },
     global: {
         fetch: customFetch
     }
 })
-
-// Auth helper functions
-export const auth = {
-    // Sign up with email
-    async signUp(email, password, username) {
-        const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-                data: {
-                    username,
-                    display_name: username
-                }
-            }
-        })
-        return { data, error }
-    },
-
-    // Sign in with email
-    async signIn(email, password) {
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password
-        })
-        return { data, error }
-    },
-
-    // Sign out
-    async signOut() {
-        const { error } = await supabase.auth.signOut()
-        return { error }
-    },
-
-    // Get current user
-    async getUser() {
-        const { data: { user } } = await supabase.auth.getUser()
-        return user
-    },
-
-    // Get session
-    async getSession() {
-        const { data: { session } } = await supabase.auth.getSession()
-        return session
-    },
-
-    // Google OAuth
-    async signInWithGoogle() {
-        const { data, error } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                redirectTo: window.location.origin
-            }
-        })
-        return { data, error }
-    },
-
-    // Password reset
-    async resetPassword(email) {
-        const { data, error } = await supabase.auth.resetPasswordForEmail(email)
-        return { data, error }
-    }
-}

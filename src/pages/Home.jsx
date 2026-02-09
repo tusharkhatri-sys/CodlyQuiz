@@ -19,8 +19,16 @@ export default function Home() {
     }, [user, loading, navigate])
 
     const handleLogout = async () => {
-        await signOut()
-        navigate('/auth')
+        try {
+            await signOut()
+        } catch (error) {
+            console.error('Logout error:', error)
+        } finally {
+            // NUCLEAR CLEAR: formatting hard disk (metaphorically)
+            window.localStorage.clear()
+            // Force hard reload to clear all state
+            window.location.href = '/auth'
+        }
     }
 
     const initial = username.charAt(0).toUpperCase()

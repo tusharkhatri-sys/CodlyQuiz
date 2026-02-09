@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
-import { AVATARS, AVATAR_TIERS, getAvatarPrice, getAvatarsByTier } from '../utils/avatars'
+import { AVATARS, AVATAR_TIERS, getAvatarPrice, getAvatarsByTier, getAvatarImage } from '../utils/avatars'
 import { ArrowLeft, Coins, Check, Lock, Sparkles } from 'lucide-react'
 import './AvatarShop.css'
 
@@ -58,21 +58,27 @@ export default function AvatarShop() {
 
         setPurchasing(true)
 
-        // Call purchase function
-        const { data, error } = await supabase
-            .rpc('purchase_avatar', {
-                avatar_id_param: avatar.id,
-                price: price
-            })
+        try {
+            // Call purchase function
+            const { data, error } = await supabase
+                .rpc('purchase_avatar', {
+                    avatar_id_param: avatar.id,
+                    price: price
+                })
 
-        if (error) {
-            setMessage({ type: 'error', text: 'Purchase failed!' })
-        } else if (data === true) {
-            setCoins(prev => prev - price)
-            setOwnedAvatars(prev => [...prev, avatar.id])
-            setMessage({ type: 'success', text: `${avatar.name} unlocked! 🎉` })
-        } else {
-            setMessage({ type: 'error', text: 'Not enough coins!' })
+            if (error) {
+                console.error('Purchase Error:', error)
+                setMessage({ type: 'error', text: `Purchase failed: ${error.message}` })
+            } else if (data === true) {
+                setCoins(prev => prev - price)
+                setOwnedAvatars(prev => [...prev, avatar.id])
+                setMessage({ type: 'success', text: `${avatar.name} unlocked! 🎉` })
+            } else {
+                setMessage({ type: 'error', text: 'Not enough coins!' })
+            }
+        } catch (err) {
+            console.error('Purchase Exception:', err)
+            setMessage({ type: 'error', text: 'Something went wrong!' })
         }
 
         setPurchasing(false)
@@ -168,12 +174,16 @@ export default function AvatarShop() {
                                 {tier.icon}
                             </div>
 
-                            {/* Avatar Emoji */}
+                            {/* Avatar Image */}
                             <div
-                                className="avatar-emoji"
-                                style={{ background: avatar.bg }}
+                                className="avatar-image-container"
+                                style={{ background: avatar.bg || '#f0f0f0' }}
                             >
-                                {avatar.emoji}
+                                <img
+                                    src={getAvatarImage(avatar)}
+                                    alt={avatar.name}
+                                    className="avatar-img"
+                                />
                                 {!owned && <div className="lock-overlay"><Lock size={30} /></div>}
                                 {equipped && <div className="equipped-badge"><Check size={20} /></div>}
                             </div>

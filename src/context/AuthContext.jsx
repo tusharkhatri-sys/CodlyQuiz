@@ -2,27 +2,8 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
 const AuthContext = createContext({})
-const SESSION_KEY = 'codlyquiz-session'
 
 export const useAuth = () => useContext(AuthContext)
-
-// Manual session helpers
-const saveSession = (session) => {
-    if (session) {
-        localStorage.setItem(SESSION_KEY, JSON.stringify(session))
-    } else {
-        localStorage.removeItem(SESSION_KEY)
-    }
-}
-
-const getSavedSession = () => {
-    try {
-        const saved = localStorage.getItem(SESSION_KEY)
-        return saved ? JSON.parse(saved) : null
-    } catch {
-        return null
-    }
-}
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null)
@@ -33,25 +14,30 @@ export function AuthProvider({ children }) {
         console.log('AuthProvider mounted')
         let mounted = true
 
-        async function initSession() {
-            try {
-                // Try to restore saved session first (NO Supabase auth calls!)
-                const savedSession = getSavedSession()
-                if (savedSession?.user) {
-                    console.log('Restoring saved session')
-                    setUser(savedSession.user)
-                    // Load profile in background
-                    loadProfile(savedSession.user.id).catch(console.error)
-                }
-            } catch (error) {
-                console.error('Session restore error:', error)
-                localStorage.removeItem(SESSION_KEY)
-            } finally {
-                if (mounted) setLoading(false)
+        // Check for existing session
+        supabase.auth.getSession().then(({ data, error }) => {
+            if (error) {
+                console.error('Session check error:', error)
+            } else if (mounted && data?.session?.user) {
+                console.log('Restoring Supabase session', data.session.user.id)
+                setUser(data.session.user)
+                loadProfile(data.session.user.id)
+                    .then(() => console.log('Profile loaded successfully'))
+                    .catch(e => console.error('Profile load failed', e))
             }
-        }
+        }).catch(err => {
+            console.error('Session initialization failed:', err)
+        }).finally(() => {
+            if (mounted) setLoading(false)
+        })
 
-        initSession()
+        // Backup timeout to prevent infinite loading
+        setTimeout(() => {
+            if (mounted && loading) {
+                console.warn('Force disabling loader after timeout')
+                setLoading(false)
+            }
+        }, 3000)
 
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -67,13 +53,11 @@ export function AuthProvider({ children }) {
                 if (mounted) {
                     if (session?.user) {
                         setUser(session.user)
-                        saveSession(session)
-                        await loadProfile(session.user.id)
+                        loadProfile(session.user.id).catch(e => console.error('Background profile load failed:', e))
                     } else if (_event === 'SIGNED_OUT') {
                         // Only clear on explicit sign out
                         setUser(null)
                         setProfile(null)
-                        saveSession(null)
                     }
                 }
             }
@@ -86,14 +70,29 @@ export function AuthProvider({ children }) {
     }, [])
 
     const loadProfile = async (userId) => {
-        const { data } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', userId)
-            .single()
+        try {
+            console.log('Fetching profile for:', userId)
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', userId)
+                .single()
 
-        if (data) {
-            setProfile(data)
+            if (error) {
+                console.error('Error fetching profile:', error)
+                // Assuming RLS or missing profile - create one if needed? 
+                // For now, just log it.
+                return
+            }
+
+            if (data) {
+                console.log('Profile loaded:', data)
+                setProfile(data)
+            } else {
+                console.warn('Profile loaded but data is null')
+            }
+        } catch (err) {
+            console.error('Exception in loadProfile:', err)
         }
     }
 
@@ -127,33 +126,73 @@ export function AuthProvider({ children }) {
         selectedAvatar: profile?.selected_avatar || 'fox',
 
         signUp: async (email, password, username) => {
-            const { data, error } = await supabase.auth.signUp({
-                email,
-                password,
-                options: {
-                    data: { username, display_name: username }
-                }
-            })
-            return { data, error }
+            try {
+                const { data, error } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: { username, display_name: username }
+                    }
+                })
+                if (error) throw error
+                return { data, error: null }
+            } catch (error) {
+                console.error('Sign up error:', error)
+                return { data: null, error }
+            }
         },
         signIn: async (email, password) => {
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email,
-                password
-            })
-            return { data, error }
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password
+                })
+                if (error) throw error
+                return { data, error: null }
+            } catch (error) {
+                console.error('Sign in error:', error)
+                return { data: null, error }
+            }
         },
         signOut: async () => {
-            const { error } = await supabase.auth.signOut()
-            setProfile(null)
-            return { error }
+            try {
+                // Attempt standard sign out with timeout
+                const { error } = await Promise.race([
+                    supabase.auth.signOut(),
+                    new Promise(resolve => setTimeout(() => resolve({ error: 'timeout' }), 2000))
+                ])
+                if (error) console.warn('Supabase sign out error/timeout:', error)
+            } catch (error) {
+                console.error('Sign out exception:', error)
+            } finally {
+                // FORCE cleanup local state regardless of server response
+                setUser(null)
+                setProfile(null)
+
+                // Clear any lingering keys
+                try {
+                    localStorage.removeItem('codlyquiz-session')
+                    localStorage.removeItem('sb-prsynwfjkhtdaqluwigq-auth-token')
+                    window.localStorage.clear() // NUCLEAR OPTION: Clear everything
+                } catch (e) {
+                    console.error('LocalStorage cleanup error:', e)
+                }
+
+                return { error: null }
+            }
         },
         signInWithGoogle: async () => {
-            const { data, error } = await supabase.auth.signInWithOAuth({
-                provider: 'google',
-                options: { redirectTo: window.location.origin }
-            })
-            return { data, error }
+            try {
+                const { data, error } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: { redirectTo: window.location.origin }
+                })
+                if (error) throw error
+                return { data, error: null }
+            } catch (error) {
+                console.error('Google sign in error:', error)
+                return { data: null, error }
+            }
         }
     }
 

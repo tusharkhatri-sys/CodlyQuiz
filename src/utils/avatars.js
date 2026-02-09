@@ -1,62 +1,106 @@
-// CodlyQuiz Avatar System with Tiers and Prices
+// CodlyQuiz Avatar System - Kahoot Style Characters
+// Uses SVG-wrapped Emojis for consistent, cute avatars
 
 // Avatar Tiers
 export const AVATAR_TIERS = {
-    FREE: { name: 'Free', price: 0, color: '#27AE60', icon: '🆓' },
-    COMMON: { name: 'Common', price: 50, color: '#95A5A6', icon: '⚪' },
-    RARE: { name: 'Rare', price: 150, color: '#3498DB', icon: '🔵' },
-    EPIC: { name: 'Epic', price: 300, color: '#9B59B6', icon: '🟣' },
-    LEGENDARY: { name: 'Legendary', price: 500, color: '#F1C40F', icon: '🟡' }
+    FREE: { name: 'Free', price: 0, color: '#46178F', icon: '🆓' }, // Kahoot Purple
+    COMMON: { name: 'Common', price: 50, color: '#27AE60', icon: '⚪' },
+    RARE: { name: 'Rare', price: 100, color: '#2980B9', icon: '🔵' },
+    EPIC: { name: 'Epic', price: 150, color: '#8E44AD', icon: '🟣' },
+    LEGENDARY: { name: 'Legendary', price: 250, color: '#F1C40F', icon: '🟡' }
 }
 
-// All Avatars with Tiers
+// Background colors for avatars (Pastel/Vibrant palette)
+const BG_COLORS = [
+    '#FFD1DC', '#FFABAB', '#FFC3A0', '#FF677D', '#D4A5A5', // Reds/Pinks
+    '#392F5A', '#31A2AC', '#61C0BF', '#6B4226', '#D9BF77', // Earth/Teals
+    '#ACD8AA', '#FFE66D', '#2F9599', '#F7DB4F', '#F9CF00', // Yellows/Greens
+    '#4ECDC4', '#C7F464', '#FF6B6B', '#45B7D1', '#E0F2F1'  // Vibrant Mix
+];
+
+// Helper to generate SVG Data URI
+const generateAvatarSvg = (emoji, bgColor) => {
+    // Basic SVG with colored rounded rectangle and centered emoji
+    const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+        <rect width="100" height="100" fill="${bgColor}" rx="15"/>
+        <text x="50" y="70" font-size="65" text-anchor="middle" style="font-family: 'Segoe UI Emoji', 'Apple Color Emoji', sans-serif;">${emoji}</text>
+    </svg>
+    `.trim();
+    // Fix for Unicode/Emoji in btoa
+    // buffers emoji -> utf-8 -> binary string -> base64
+    const encoded = btoa(unescape(encodeURIComponent(svg)));
+    return `data:image/svg+xml;base64,${encoded}`;
+}
+
+// Old DiceBear generator (kept for backward compatibility if needed, but unused)
+const getDiceBearUrl = (seed, style) => {
+    return `https://api.dicebear.com/7.x/${style}/svg?seed=${seed}`
+}
+
+// All Avatars - Kahoot Style Animals & Characters
 export const AVATARS = [
-    // FREE TIER (Default unlocked)
-    { id: 'fox', emoji: '🦊', name: 'Fox', bg: '#FF6B35', tier: 'FREE' },
-    { id: 'frog', emoji: '🐸', name: 'Frog', bg: '#26890C', tier: 'FREE' },
-    { id: 'lion', emoji: '🦁', name: 'Lion', bg: '#D89E00', tier: 'FREE' },
-    { id: 'panda', emoji: '🐼', name: 'Panda', bg: '#333333', tier: 'FREE' },
-    { id: 'turtle', emoji: '🐢', name: 'Turtle', bg: '#1ABC9C', tier: 'FREE' },
-    { id: 'bee', emoji: '🐝', name: 'Bee', bg: '#F1C40F', tier: 'FREE' },
+    // ROW 1
+    { id: 'bear', name: 'Bear', tier: 'FREE', emoji: '🐻', color: '#8D6E63' },
+    { id: 'moose', name: 'Moose', tier: 'FREE', emoji: '🦌', color: '#A1887F' },
+    { id: 'dog', name: 'Dog', tier: 'FREE', emoji: '🐶', color: '#FFCCBC' },
+    { id: 'cat', name: 'Cat', tier: 'FREE', emoji: '🐱', color: '#FFE0B2' },
+    { id: 'mouse', name: 'Mouse', tier: 'FREE', emoji: '🐭', color: '#F5F5F5' },
+    { id: 'rabbit', name: 'Rabbit', tier: 'FREE', emoji: '🐰', color: '#E1BEE7' },
 
-    // COMMON TIER (50 coins)
-    { id: 'robot', emoji: '🤖', name: 'Robot', bg: '#5D6D7E', tier: 'COMMON' },
-    { id: 'ghost', emoji: '👻', name: 'Ghost', bg: '#95A5A6', tier: 'COMMON' },
-    { id: 'dino', emoji: '🦖', name: 'Dino', bg: '#27AE60', tier: 'COMMON' },
-    { id: 'koala', emoji: '🐨', name: 'Koala', bg: '#7F8C8D', tier: 'COMMON' },
-    { id: 'shark', emoji: '🦈', name: 'Shark', bg: '#2980B9', tier: 'COMMON' },
-    { id: 'flamingo', emoji: '🦩', name: 'Flamingo', bg: '#FF69B4', tier: 'COMMON' },
-    { id: 'owl', emoji: '🦉', name: 'Owl', bg: '#8B4513', tier: 'COMMON' },
-    { id: 'crab', emoji: '🦀', name: 'Crab', bg: '#E74C3C', tier: 'COMMON' },
+    // ROW 2
+    { id: 'fox', name: 'Fox', tier: 'COMMON', emoji: '🦊', color: '#FFAB91' },
+    { id: 'wolf', name: 'Wolf', tier: 'COMMON', emoji: '🐺', color: '#B0BEC5' },
+    { id: 'raccoon', name: 'Raccoon', tier: 'COMMON', emoji: '🦝', color: '#90A4AE' },
+    { id: 'panda', name: 'Panda', tier: 'COMMON', emoji: '🐼', color: '#FFFFFF' },
+    { id: 'frog', name: 'Frog', tier: 'COMMON', emoji: '🐸', color: '#C5E1A5' },
+    { id: 'owl', name: 'Owl', tier: 'COMMON', emoji: '🦉', color: '#D7CCC8' },
 
-    // RARE TIER (150 coins)
-    { id: 'unicorn', emoji: '🦄', name: 'Unicorn', bg: '#E056FD', tier: 'RARE' },
-    { id: 'dragon', emoji: '🐲', name: 'Dragon', bg: '#26890C', tier: 'RARE' },
-    { id: 'wolf', emoji: '🐺', name: 'Wolf', bg: '#5D6D7E', tier: 'RARE' },
-    { id: 'eagle', emoji: '🦅', name: 'Eagle', bg: '#8B4513', tier: 'RARE' },
-    { id: 'phoenix', emoji: '🔥', name: 'Phoenix', bg: '#E74C3C', tier: 'RARE' },
-    { id: 'tiger', emoji: '🐯', name: 'Tiger', bg: '#FF8C00', tier: 'RARE' },
-    { id: 'octopus', emoji: '🐙', name: 'Octopus', bg: '#9B59B6', tier: 'RARE' },
+    // ROW 3
+    { id: 'chick', name: 'Chick', tier: 'COMMON', emoji: '🐥', color: '#FFF59D' },
+    { id: 'parrot', name: 'Parrot', tier: 'COMMON', emoji: '🦜', color: '#C8E6C9' },
+    { id: 'penguin', name: 'Penguin', tier: 'COMMON', emoji: '🐧', color: '#81D4FA' },
+    { id: 'polarbear', name: 'Polar Bear', tier: 'RARE', emoji: '🐻‍❄️', color: '#E0F7FA' },
+    { id: 'snowman', name: 'Snowman', tier: 'RARE', emoji: '⛄', color: '#B2EBF2' },
+    { id: 'sheep', name: 'Sheep', tier: 'RARE', emoji: '🐑', color: '#F8BBD0' },
 
-    // EPIC TIER (300 coins)
-    { id: 'dark_knight', emoji: '⚔️', name: 'Dark Knight', bg: '#2C3E50', tier: 'EPIC' },
-    { id: 'wizard', emoji: '🧙', name: 'Wizard', bg: '#8E44AD', tier: 'EPIC' },
-    { id: 'king', emoji: '👑', name: 'King', bg: '#F39C12', tier: 'EPIC' },
-    { id: 'ice_queen', emoji: '❄️', name: 'Ice Queen', bg: '#3498DB', tier: 'EPIC' },
-    { id: 'ninja', emoji: '🥷', name: 'Shadow Ninja', bg: '#1A1A2E', tier: 'EPIC' },
-    { id: 'fire_spirit', emoji: '🔮', name: 'Fire Spirit', bg: '#E74C3C', tier: 'EPIC' },
+    // ROW 4
+    { id: 'tiger', name: 'Tiger', tier: 'RARE', emoji: '🐯', color: '#FFCC80' },
+    { id: 'koala', name: 'Koala', tier: 'RARE', emoji: '🐨', color: '#CFD8DC' },
+    { id: 'kangaroo', name: 'Kangaroo', tier: 'RARE', emoji: '🦘', color: '#D7CCC8' },
+    { id: 'horse', name: 'Horse', tier: 'EPIC', emoji: '🐴', color: '#BCAAA4' },
+    { id: 'unicorn', name: 'Unicorn', tier: 'EPIC', emoji: '🦄', color: '#F3E5F5' },
+    { id: 'dragon', name: 'Dragon', tier: 'EPIC', emoji: '🐲', color: '#A5D6A7' },
 
-    // LEGENDARY TIER (500 coins)
-    { id: 'golden_dragon', emoji: '🐉', name: 'Golden Dragon', bg: 'linear-gradient(135deg, #FFD700, #FFA500)', tier: 'LEGENDARY' },
-    { id: 'diamond_fox', emoji: '💎', name: 'Diamond Fox', bg: 'linear-gradient(135deg, #00D2FF, #3A7BD5)', tier: 'LEGENDARY' },
-    { id: 'rainbow_unicorn', emoji: '🌈', name: 'Rainbow Unicorn', bg: 'linear-gradient(135deg, #FF6B6B, #4ECDC4, #45B7D1)', tier: 'LEGENDARY' },
-    { id: 'alien_king', emoji: '👾', name: 'Alien King', bg: 'linear-gradient(135deg, #00F260, #0575E6)', tier: 'LEGENDARY' },
-    { id: 'mystic_mask', emoji: '🎭', name: 'Mystic Mask', bg: 'linear-gradient(135deg, #8E2DE2, #4A00E0)', tier: 'LEGENDARY' },
+    // ROW 5
+    { id: 'monster_green', name: 'Alien', tier: 'EPIC', emoji: '👾', color: '#B39DDB' },
+    { id: 'monster_red', name: 'Ogre', tier: 'EPIC', emoji: '👹', color: '#EF9A9A' },
+    { id: 'brain', name: 'Brain', tier: 'LEGENDARY', emoji: '🧠', color: '#F48FB1' },
+    { id: 'zombie', name: 'Zombie', tier: 'LEGENDARY', emoji: '🧟', color: '#80CBC4' },
+    { id: 'skull', name: 'Skull', tier: 'LEGENDARY', emoji: '💀', color: '#EEEEEE' },
+    { id: 'earth', name: 'Earth', tier: 'LEGENDARY', emoji: '🌍', color: '#4DB6AC' }
 ]
 
 // Helper functions
 export const getAvatarById = (id) => {
     return AVATARS.find(a => a.id === id) || AVATARS[0]
+}
+
+export const getAvatarImage = (avatar) => {
+    // Handle string ID input
+    if (typeof avatar === 'string') {
+        const found = getAvatarById(avatar)
+        if (found) avatar = found
+        else return getDiceBearUrl(avatar, 'adventurer-neutral') // Fallback
+    }
+
+    // Return Emoji SVG if available
+    if (avatar && avatar.emoji) {
+        return generateAvatarSvg(avatar.emoji, avatar.color || '#f0f0f0')
+    }
+
+    // Legacy fallback (shouldn't be reached if using provided list)
+    return getDiceBearUrl(avatar?.id || 'default', 'adventurer-neutral')
 }
 
 export const getAvatarPrice = (avatar) => {
@@ -105,3 +149,4 @@ export const COIN_REWARDS = {
 export const getCoinsForRank = (rank) => {
     return COIN_REWARDS[rank] || COIN_REWARDS.default
 }
+
