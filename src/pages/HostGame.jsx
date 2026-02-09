@@ -224,7 +224,10 @@ export default function HostGame() {
 
     const showAnswerStats = () => {
         const q = questions[currentIndex]
-        const questionAnswers = answers.filter(a => a.question_id === q.id)
+        // robustly filter answers: must match question AND player must be in this session
+        const questionAnswers = answers.filter(a =>
+            a.question_id === q.id && players.some(p => p.id === a.player_id)
+        )
 
         // Calculate stats for each option
         const stats = q.answer_options
