@@ -51,28 +51,41 @@ export default function HostGame() {
     }
 
     useEffect(() => {
-        const playersChannel = supabase
-            .channel('game_players')
+        // Unique channel name to avoid collisions
+        const channelId = `game_session:${sessionId}`
+
+        console.log('Setting up real-time subscription for session:', sessionId)
+
+        const gameChannel = supabase
+            .channel(channelId)
             .on('postgres_changes',
                 { event: 'INSERT', schema: 'public', table: 'game_players', filter: `session_id=eq.${sessionId}` },
                 (payload) => {
+                    console.log('New player joined:', payload.new)
                     setPlayers(prev => [...prev, payload.new])
                     audioManager.playSfx('join')
                 }
             )
-            .subscribe()
-
-        const answersChannel = supabase
-            .channel('player_answers')
             .on('postgres_changes',
                 { event: 'INSERT', schema: 'public', table: 'player_answers' },
-                (payload) => setAnswers(prev => [...prev, payload.new])
+                (payload) => {
+                    console.log('New answer received:', payload.new)
+                    setAnswers(prev => [...prev, payload.new])
+                }
             )
-            .subscribe()
+            .subscribe((status) => {
+                console.log(`Subscription status for ${channelId}:`, status)
+                if (status === 'SUBSCRIBED') {
+                    console.log('✅ Real-time connection established')
+                } else if (status === 'CHANNEL_ERROR') {
+                    console.error('❌ Real-time connection failed')
+                    setError('Real-time connection failed. Retrying...')
+                }
+            })
 
         return () => {
-            supabase.removeChannel(playersChannel)
-            supabase.removeChannel(answersChannel)
+            console.log('Cleaning up subscription for:', sessionId)
+            supabase.removeChannel(gameChannel)
         }
     }, [sessionId])
 
